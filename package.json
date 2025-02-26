@@ -1,6 +1,6 @@
 {
   "name": "i18n-app-translator",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "AI-powered translation tool for i18n files with vector database support",
   "type": "module",
   "main": "dist/index.js",
@@ -47,7 +47,7 @@
     "pinecone",
     "cli"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "tumf <y.takahara@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
