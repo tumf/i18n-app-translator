@@ -1,0 +1,84 @@
+---
+description: Selective Unit Testing Guidelines for Excluding Non-Critical Code
+globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx
+alwaysApply: false
+---
+## 1. Simple Getters and Setters
+
+Why avoid covering them in unit tests?
+
+	•	Simple getters and setters often do nothing more than pass or return a variable without any additional logic.
+	•	Testing these methods typically adds little value because the functionality is trivial, and errors are very unlikely to occur there.
+
+```javascript
+// Example in Java-like code
+public class User {
+    private String name;
+
+    public String getName() {
+        return name; // Very simple getter
+    }
+
+    public void setName(String name) {
+        this.name = name; // Very simple setter
+    }
+}
+```
+
+	When to reconsider: If a getter or setter contains non-trivial logic (e.g., validation or additional processing), then it should be tested.
+
+## 2. Code That is Strongly Dependent on External Libraries
+
+Why avoid covering them in unit tests?
+
+	•	Standard libraries and well-established third-party libraries are typically well-tested by their maintainers.
+	•	Re-testing the library’s internal behavior can lead to redundant tests and maintenance overhead.
+	•	Instead, focus on tests that verify how your application logic interacts with the library (i.e., the interface or wrapper you create around it).
+
+```javascript
+// Example in TypeScript
+import moment from 'moment';
+
+export function formatDate(date: Date): string {
+    // The library's internal logic is already well-tested.
+    return moment(date).format('YYYY/MM/DD');
+}
+```
+
+	When to reconsider: Ensure your wrapper code or integration logic around the library is tested to confirm correct usage of the library, but you generally don’t need to test the library’s internals.
+
+## 3. Environment-Dependent Code
+
+Why avoid covering them in unit tests?
+
+	•	Code that depends on external factors like file systems, network connections, OS-specific features, or hardware is often unstable or unpredictable in a pure unit test environment.
+	•	These dependencies can cause flaky tests and complicate continuous integration workflows.
+	•	Such code is better handled through integration tests or end-to-end (E2E) tests, often employing mocks or stubs when needed.
+
+```javascript
+// Example in TypeScript
+export function readFromFile(filePath: string): string {
+    // Directly accessing the file system might fail under certain OS/file permissions.
+    // This is typically tested in integration tests, not unit tests.
+    const content = Deno.readTextFileSync(filePath);
+    return content;
+}
+```
+
+	When to reconsider: If you can abstract environment-dependent logic behind an interface and mock it reliably, you can still unit-test the higher-level logic that uses it. But testing the environment-specific details is usually an integration concern.
+
+## 4. Logging and Debug-Only Code
+
+Why avoid covering them in unit tests?
+
+	•	Logging statements or debug hooks often do not affect business logic.
+	•	Maintaining tests for such code can bloat your test suite and make it harder to identify genuine issues.
+	•	In many cases, logging statements are tested implicitly when verifying other functionalities or are checked in integration/E2E stages.
+
+```javascript
+export function logMessage(msg: string): void {
+    console.log(`[LOG]: ${msg}`);
+}
+```
+
+	When to reconsider: If the logs themselves contain critical information or transformations that matter to the application’s workflow, then treat that as business logic and test it accordingly.

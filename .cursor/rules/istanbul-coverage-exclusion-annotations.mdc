@@ -1,0 +1,36 @@
+---
+description: when you find the code which you should not test for jtest
+globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx
+alwaysApply: false
+---
+Istanbul provides a set of special comments (directives) that allow you to exclude specific parts of your code from coverage reports. This can be useful when you have code that is either trivial, environment-dependent, or not critical to test. Below is the complete list of Istanbul ignore directives along with explanations for each:
+
+	•	/* istanbul ignore file */
+
+Excludes the entire file from coverage analysis. Use this when you have a whole file that you do not want to include in your coverage report.
+
+	•	/* istanbul ignore next */
+
+Excludes the statement immediately following this comment from coverage analysis. This is useful for skipping over a single line of code that might be difficult to test or is non-critical.
+
+```
+try {
+  // Code that may throw an error
+  riskyOperation();
+} 
+/* istanbul ignore next */
+catch (error) {
+  // This catch block will be excluded from the coverage report.
+  console.error('An error occurred:', error);
+}
+```
+
+	•	/* istanbul ignore else */
+
+Excludes the else branch of an if statement from coverage analysis. This can be applied when the else part is trivial or not applicable in your tests.
+
+	•	/* istanbul ignore if */
+
+Excludes the if branch of an if statement from coverage analysis. Use this directive when the condition or branch is not essential to be covered by tests.
+
+By incorporating these directives in your code, you can tailor your test coverage reports to focus on the critical parts of your application, ensuring that you maintain both high quality and manageable test suites.

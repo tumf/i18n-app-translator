@@ -1,0 +1,252 @@
+---
+description: Requirements for this project
+globs: 
+alwaysApply: false
+---
+# i18n-app-translator: 大規模翻訳ファイル多言語化ツール
+
+## 本アプリの概要
+
+本アプリは、大規模な英語ベース(en.jsonなど)の翻訳ファイルを多言語化するためのCLIツールです。
+単純な逐語訳ではなく、ソースコード上での利用シーン(ボタン、見出し、注意書きなど)を踏まえた文脈情報を用いてLLMに翻訳を依頼します。
+さらに、ベクターデータベースを活用することで、既存の翻訳や用語集から文脈の近い翻訳を検索し、表記揺れを極力抑えた自然な翻訳を実現します。
+
+## 主な要件と特徴
+
+- **LLMを利用した翻訳**: ボタンや見出し等のコンテキストを含め、自然な翻訳を実施
+- **表記揺れ対策**: 用語集(グロッサリ)に加えて、ベクターデータベースで過去の翻訳を参照・活用
+- **既存の翻訳ファイルを継続利用**: すでに部分的に翻訳済みの ja.json などがある場合、その続きを翻訳または改善提案を行う
+- **多言語対応**: ja.json, vi.json, th.json など、対象言語ごとに分かれたファイルを扱う
+- **CLI形式(TypeScript製)**: AI SDK を利用してLLMを切り替えられるように設計
+
+## システム構成
+
+```
+├── src
+│   ├── index.ts       // CLIのエントリーポイント
+│   ├── translator.ts  // 翻訳・改善提案機能
+│   ├── parser.ts      // ソースコード解析 (キー&コンテキスト抽出)
+│   ├── glossary.ts    // 用語集管理
+│   ├── aiClient.ts    // AI SDKとの連携
+│   └── vectorDBClient.ts  // ベクターデータベースとのやりとり
+├── en.json            // 英語原文ファイル(10,000行以上)
+├── ja.json            // 日本語翻訳ファイル(部分的に翻訳済)
+├── vi.json            // ベトナム語翻訳ファイル
+├── th.json            // タイ語翻訳ファイル
+├── glossary.json      // 用語集
+├── package.json
+└── tsconfig.json
+```
+
+## 主要コンポーネント
+
+### 1. parser.ts
+
+- ソースコード内の翻訳キー(t('some.key')など)を抽出し、使用箇所の文脈(見出しやボタンなど)を判定して返す
+
+### 2. glossary.ts
+
+- 用語集(例: "Wallet": "ウォレット")を管理し、翻訳時に必ず特定の表記を使うようLLMに指示
+
+### 3. aiClient.ts
+
+- AI SDK を利用して、翻訳や改善提案を行う
+- モデル切り替えやAPIキー管理を行いやすい構造にする
+
+### 4. translator.ts
+
+- 翻訳キー、コンテキスト、用語集、既存翻訳を組み合わせてプロンプトを生成
+- LLMからの応答をファイルに書き込む処理(およびベクターデータベースへの登録)も担当
+
+### 5. vectorDBClient.ts
+
+- ベクターデータベースとの接続(Weaviate, Pinecone, Milvusなど)を管理
+- 翻訳元テキストや既存の翻訳をEmbedding化して保存
+- 新規翻訳時に類似する既存訳を検索してLLMに提示し、表記揺れを抑える
+
+## ベクターデータベースを使う理由
+
+- **表現の一貫性**: 過去に翻訳された類似文を検索し、同じ用語や文体を用いることで表記揺れを最小化
+- **文脈を活かした翻訳**: 翻訳キー＋コンテキスト情報をEmbedding化し、似たような場面の翻訳を参考にする
+- **スケーラビリティ**: 10, 000行以上の翻訳キーを扱う場合でも、高速に類似検索可能
+
+## CLI コマンド設計
+
+このアプリは `i18n-app-translator` という名前のCLIを想定しています。package.json のスクリプトや npx i18n-app-translator で呼び出せるようにします。
+
+### translate
+
+- **目的**: 新規または未翻訳のキーを翻訳し、翻訳結果を更新する
+- **フロー**:
+  1. ソースコードからキーと文脈を抽出(parser.ts)
+  2. en.json と既存の翻訳ファイル(ja.json など)を比較し、未翻訳キーを抽出
+  3. ベクターデータベース検索により、類似キーの翻訳を取得
+  4. LLMに用語集＋類似例＋文脈を渡して翻訳生成
+  5. 結果を翻訳ファイルに書き込み、ベクターデータベースに登録
+
+**例**:
+
+```bash
+npx i18n-app-translator translate --lang ja --source ./locales/en.json --dest ./locales/ja.json
+```
+
+**オプション例**:
+- `--lang <language>`: 翻訳先言語
+- `--source <file>`: 翻訳元ファイル
+- `--dest <file>`: 翻訳先ファイル
+- `--context <folder>`: ソースコード解析用ディレクトリ
+- `--batch-size <number>`: 一度に翻訳するキー数
+- `--dry-run`: 書き込みせずに結果のみ表示
+
+### review
+
+- **目的**: 既存の翻訳ファイルをLLMに渡して改善提案を得る
+- **フロー**:
+  1. 翻訳ファイルから全キーの訳文を取得
+  2. LLMに原文(英語)＋既存訳＋コンテキスト(あれば)を提示し、改善できる箇所を提案させる
+  3. 改善結果をユーザが確認し、採用するかどうかを選ぶ(インタラクティブモードが便利)
+
+**例**:
+
+```bash
+npx i18n-app-translator review --lang ja --file ./locales/ja.json --interactive
+```
+
+### import
+
+- **目的**: 既存翻訳ファイル(ja.json や vi.json 等)をベクターデータベースに取り込み、今後の翻訳に活かす
+- **フロー**:
+  1. ファイル内の各キー(英語と翻訳)をEmbedding化
+  2. ベクターデータベースにアップサート
+
+**例**:
+
+```bash
+npx i18n-app-translator import --lang ja --file ./locales/ja.json
+```
+
+### build-vector
+
+- **目的**: ソースコードや翻訳ファイル全体を解析し、新たにEmbeddingを生成してベクターデータベースに格納
+- **フロー**:
+  1. parser.ts でソースコードを走査し、すべての翻訳キーと文脈情報を収集
+  2. 英語原文と、該当する翻訳(存在すれば)をEmbedding化
+  3. ベクターデータベースにまとめてアップサート
+
+**例**:
+
+```bash
+npx i18n-app-translator build-vector --source ./locales/en.json --context ./src
+```
+
+### search
+
+- **目的**: ベクターデータベースで翻訳内容や文脈を検索し、類似度の高い既存訳を表示(デバッグ・確認用)
+- **フロー**:
+  1. 入力テキストをEmbedding化
+  2. ベクターデータベースから類似上位N件を取得
+  3. 取得した翻訳や文脈をコンソールに表示
+
+**例**:
+
+```bash
+npx i18n-app-translator search "wallet top up" --lang ja --top-k 5
+```
+
+## 実装例 (commander.js)
+
+以下は commander.js を使ったCLI実装サンプルです。
+
+```typescript
+#!/usr/bin/env node
+import { Command } from 'commander';
+import { translate } from './commands/translate';
+import { review } from './commands/review';
+import { importTranslations } from './commands/import';
+import { buildVector } from './commands/buildVector';
+import { searchTranslations } from './commands/search';
+
+const program = new Command();
+
+program
+  .name("i18n-app-translator")
+  .description("CLI for multi-language i18n with LLM & Vector DB")
+  .version("0.1.0");
+
+program
+  .command("translate")
+  .description("Translate new or updated keys using LLM, update JSON, and Vector DB")
+  .option("--lang <lang>", "Target language", "ja")
+  .option("--source <path>", "Source JSON (e.g. en.json)")
+  .option("--dest <path>", "Destination JSON (e.g. ja.json)")
+  .option("--batch-size <number>", "Batch size for translation", "50")
+  .option("--dry-run", "Show result without writing to file")
+  .option("--context <path>", "Folder to analyze code context")
+  .option("--glossary <path>", "Glossary file")
+  .option("--no-vector", "Disable Vector DB update")
+  .action((options) => {
+    translate(options);
+  });
+
+program
+  .command("review")
+  .description("Review existing translations and propose improvements")
+  .option("--lang <lang>", "Target language", "ja")
+  .option("--file <path>", "Translation file to review")
+  .option("--key <key>", "Review only a specific key")
+  .option("--interactive", "Enable interactive mode for acceptance")
+  .option("--batch-size <number>", "Batch size for improvements", "50")
+  .option("--glossary <path>", "Glossary file")
+  .action((options) => {
+    review(options);
+  });
+
+program
+  .command("import")
+  .description("Import existing translation file into Vector DB")
+  .option("--lang <lang>", "Language of the file", "ja")
+  .option("--file <path>", "Translation file to import")
+  .option("--context <path>", "Folder to analyze code context")
+  .option("--glossary <path>", "Glossary file")
+  .action((options) => {
+    importTranslations(options);
+  });
+
+program
+  .command("build-vector")
+  .description("Build embeddings from source or translations, save to Vector DB")
+  .option("--source <path>", "Source JSON (e.g. en.json)")
+  .option("--lang <lang>", "Language to include in the build", "ja")
+  .option("--context <path>", "Code folder for context analysis")
+  .option("--batch-size <number>", "Batch size for embedding creation", "50")
+  .option("--glossary <path>", "Glossary file")
+  .action((options) => {
+    buildVector(options);
+  });
+
+program
+  .command("search <query>")
+  .description("Search similar translations in Vector DB")
+  .option("--lang <lang>", "Target language for searching translations")
+  .option("--top-k <number>", "Number of results to show", "5")
+  .option("--mode <mode>", "Search in source or target", "source")
+  .action((query, options) => {
+    searchTranslations(query, options);
+  });
+
+program.parse(process.argv);
+```
+
+## 今後の拡張
+
+- **Webインターフェース**: ブラウザ上で翻訳文をプレビューし、簡単に修正・承認できるUIを提供
+- **自動テストとの連携**: 翻訳キー漏れやNGワードを自動チェック
+- **用語集の自動学習**: 頻出単語やフレーズを自動検出し、用語集へ追加する仕組み
+
+## 参考
+
+- LLMや埋め込みAPI、モデル切り替えに利用可能な AI SDK
+- ベクターデータベースの例:
+  - Weaviate
+  - Pinecone
+  - Milvus

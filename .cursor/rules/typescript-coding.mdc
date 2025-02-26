@@ -1,0 +1,36 @@
+---
+description: typescript coding style, lint rules
+globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx
+alwaysApply: false
+---
+This ESLint configuration extends the recommended rules for Next.js projects, including those for core web vitals and TypeScript. It is designed to help maintain high code quality and consistency in projects built with Next.js.
+
+TypeScript File Rules
+
+1. Quotes
+	•	Rule Description: All strings must be enclosed in single quotes.
+	•	Exception: If using single quotes would require escaping characters, double quotes can be used instead.
+
+2. Interface Naming Convention
+	•	Rule Description: When naming interfaces in TypeScript, the names must be in PascalCase and should start with the letter “I”.
+	•	Example: An interface should be named like IUserProfile rather than UserProfile.
+
+3. Consistent Type Imports
+	•	Rule Description: For importing types, the configuration enforces the use of the import type syntax. This helps in clearly distinguishing between type imports and value imports.
+
+4. Arrow Function Parentheses
+	•	Rule Description: Arrow functions must always enclose their parameters within parentheses, even if there is only one parameter.
+	•	Example: Instead of writing x => x * 2, you should write (x) => x * 2.
+
+5. Object Curly Spacing
+	•	Rule Description: When defining objects, spaces are required inside the curly braces.
+	•	Example: An object should be formatted as { a: 1 } instead of {a:1}.
+
+6. Trailing Comma in Multiline Structures
+	•	Rule Description: In arrays and objects that span multiple lines, a trailing comma is required after the last element. This practice minimizes diffs when new elements are added.
+
+7. No Unused Variables
+	•	Rule Description: Any declared variables or function parameters that are not used will trigger an error.
+	•	Exception: Variables or parameters whose names start with an underscore (_) are treated as intentionally unused and will be ignored by this rule.
+
+This configuration ensures that your codebase remains consistent, readable, and free from common issues, promoting better development practices in Next.js and TypeScript projects.
