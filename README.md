@@ -48,6 +48,7 @@ Required environment variables:
 Vector database configuration (choose one):
 
 - For Weaviate:
+
   - `WEAVIATE_URL`: Weaviate URL (required for search)
   - `WEAVIATE_API_KEY`: Weaviate API key (optional)
 
@@ -122,6 +123,12 @@ Example configuration for Pinecone:
 ```
 
 ## Usage
+
+You can run the tool directly using npx:
+
+```bash
+npx i18n-app-translator
+```
 
 ### Translation
 

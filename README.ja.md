@@ -48,6 +48,7 @@ cp .env.example .env
 ベクターデータベース設定（いずれかを選択）:
 
 - Weaviateを使用する場合:
+
   - `WEAVIATE_URL`: WeaviateのURL（検索機能に必要）
   - `WEAVIATE_API_KEY`: WeaviateのAPIキー（オプション）
 
@@ -122,6 +123,12 @@ Pineconeを使用する場合の設定例:
 ```
 
 ## 使い方
+
+npxを使って直接ツールを実行することもできます：
+
+```bash
+npx i18n-app-translator
+```
 
 ### 翻訳
 
