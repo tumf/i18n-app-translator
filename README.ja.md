@@ -1,5 +1,12 @@
 # i18n-app-translator: 大規模翻訳ファイル多言語化ツール
 
+[![npm version](https://img.shields.io/npm/v/i18n-app-translator.svg)](https://www.npmjs.com/package/i18n-app-translator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/tumf/i18n-app-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/tumf/i18n-app-translator/actions/workflows/ci.yml)
+[![Node.js Version](https://img.shields.io/node/v/i18n-app-translator.svg)](https://nodejs.org)
+[![npm downloads](https://img.shields.io/npm/dm/i18n-app-translator.svg)](https://www.npmjs.com/package/i18n-app-translator)
+[![Coverage Status](https://coveralls.io/repos/github/tumf/i18n-app-translator/badge.svg?branch=main)](https://coveralls.io/github/tumf/i18n-app-translator?branch=main)
+
 大規模な英語ベース(en.jsonなど)の翻訳ファイルを多言語化するためのCLIツールです。
 単純な逐語訳ではなく、ソースコード上での利用シーン(ボタン、見出し、注意書きなど)を踏まえた文脈情報を用いてLLMに翻訳を依頼します。
 さらに、ベクターデータベースを活用することで、既存の翻訳や用語集から文脈の近い翻訳を検索し、表記揺れを極力抑えた自然な翻訳を実現します。

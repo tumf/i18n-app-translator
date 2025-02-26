@@ -51,12 +51,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/i18n-app-translator.git"
+    "url": "git+https://github.com/tumf/i18n-app-translator.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/i18n-app-translator/issues"
+    "url": "https://github.com/tumf/i18n-app-translator/issues"
   },
-  "homepage": "https://github.com/yourusername/i18n-app-translator#readme",
+  "homepage": "https://github.com/tumf/i18n-app-translator#readme",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/jest": "^29.5.14",

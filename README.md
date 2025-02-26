@@ -1,5 +1,12 @@
 # i18n-app-translator: Multilingual Translation Tool for Large-Scale Translation Files
 
+[![npm version](https://img.shields.io/npm/v/i18n-app-translator.svg)](https://www.npmjs.com/package/i18n-app-translator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/tumf/i18n-app-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/tumf/i18n-app-translator/actions/workflows/ci.yml)
+[![Node.js Version](https://img.shields.io/node/v/i18n-app-translator.svg)](https://nodejs.org)
+[![npm downloads](https://img.shields.io/npm/dm/i18n-app-translator.svg)](https://www.npmjs.com/package/i18n-app-translator)
+[![Coverage Status](https://coveralls.io/repos/github/tumf/i18n-app-translator/badge.svg?branch=main)](https://coveralls.io/github/tumf/i18n-app-translator?branch=main)
+
 A CLI tool for multilingual translation of large English-based translation files (e.g., en.json).
 Instead of simple word-for-word translation, it uses contextual information from the source code (buttons, headings, cautions, etc.) to request translations from LLMs.
 Additionally, by leveraging vector databases, it searches for contextually similar translations from existing translations and glossaries, resulting in natural translations with minimal terminology inconsistencies.
