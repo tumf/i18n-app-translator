@@ -1,0 +1,5 @@
+# Run lint-staged to check staged files
+npx lint-staged
+
+# Run tests
+npm test

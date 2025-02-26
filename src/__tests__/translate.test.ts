@@ -6,11 +6,7 @@ import { Glossary } from '../utils/glossary';
 import { createVectorDBClient } from '../utils/vectorDBClient';
 import { ContextExtractor } from '../utils/contextExtractor';
 import { jest } from '@jest/globals';
-
-// Mock process.exit
-const mockExit = jest.spyOn(process, 'exit').mockImplementation((code) => {
-  throw new Error(`Process.exit called with code ${code}`);
-});
+import logger from '../utils/logger';
 
 // Mock dependencies
 jest.mock('fs');
@@ -149,7 +145,15 @@ describe('translate command', () => {
         { key: 'key3', value: 'value3', context: 'context3' },
       ],
       'ja',
-      { useVectorDB: true, useGlossary: true, context: undefined },
+      {
+        useVectorDB: true,
+        useGlossary: true,
+        context: '',
+        concurrency: 5,
+        showProgress: true,
+        similarTranslationsLimit: 3,
+        debug: false,
+      },
     );
 
     // Verify the result was saved
@@ -193,11 +197,21 @@ describe('translate command', () => {
   });
 
   test('should handle errors gracefully', async () => {
+    // Mock process.exit
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`Process.exit called with code ${code}`);
+    });
+
     // Setup mock to throw an error
     mockParseI18nFile.mockRejectedValue(new Error('Test error') as never);
 
     // Mock console.error
+    const originalConsoleError = console.error;
     console.error = jest.fn();
+
+    // Mock logger.error
+    const originalLoggerError = logger.error;
+    logger.error = jest.fn();
 
     // Execute and verify
     await expect(
@@ -209,8 +223,12 @@ describe('translate command', () => {
     ).rejects.toThrow('Process.exit called with code 1');
 
     // Verify error was logged
-    expect(console.error).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
     expect(mockExit).toHaveBeenCalledWith(1);
+
+    // Restore mocks
+    console.error = originalConsoleError;
+    logger.error = originalLoggerError;
   });
 
   test('should extract context from code when contextFromCode option is provided', async () => {
