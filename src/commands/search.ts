@@ -8,11 +8,7 @@ export interface ISearchOptions {
 }
 
 export async function search(options: ISearchOptions): Promise<void> {
-  const {
-    query,
-    lang,
-    limit = 5,
-  } = options;
+  const { query, lang, limit = 5 } = options;
 
   console.log(`Searching for similar translations to "${query}" in language: ${lang}...`);
 
@@ -22,23 +18,19 @@ export async function search(options: ISearchOptions): Promise<void> {
     const vectorDBClient: IVectorDBClient = createVectorDBClient();
     await vectorDBClient.initialize();
     console.log('Vector DB client initialized');
-    
+
     // Search for similar translations
     console.log('Searching...');
-    const results = await vectorDBClient.findSimilarTranslations(
-      query,
-      lang,
-      limit
-    );
-    
+    const results = await vectorDBClient.findSimilarTranslations(query, lang, limit);
+
     // Display results
     console.log(`Found ${results.length} similar translations:`);
-    
+
     if (results.length === 0) {
       console.log('No similar translations found.');
     } else {
       console.log('\n');
-      
+
       results.forEach((result, index) => {
         const similarityPercentage = Math.round(result.similarity * 100);
         console.log(`${index + 1}. Similarity: ${similarityPercentage}%`);
@@ -47,7 +39,7 @@ export async function search(options: ISearchOptions): Promise<void> {
         console.log('');
       });
     }
-    
+
     // Close vector DB client
     await vectorDBClient.close();
   } catch (error) {

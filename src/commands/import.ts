@@ -58,24 +58,24 @@ async function importGlossary(
   glossaryPath: string,
   sourceLanguage: string,
   targetLanguage?: string,
-  format: 'json' | 'csv' = 'json'
+  format: 'json' | 'csv' = 'json',
 ): Promise<void> {
   console.log(`Importing glossary from ${sourcePath} to ${glossaryPath}...`);
-  
+
   // Load existing glossary or create new one
   const glossary = new Glossary(glossaryPath);
   await glossary.load();
-  
+
   // Read source file
   const content = await fs.promises.readFile(sourcePath, 'utf8');
-  
+
   let entries: Array<{
     term: string;
     translation: string;
     context?: string;
     notes?: string;
   }> = [];
-  
+
   // Parse source file based on format
   if (format === 'json') {
     entries = JSON.parse(content);
@@ -89,7 +89,7 @@ async function importGlossary(
         return { term, translation, context, notes };
       });
   }
-  
+
   // Add entries to glossary
   let addedCount = 0;
   for (const entry of entries) {
@@ -97,26 +97,26 @@ async function importGlossary(
       console.warn(`Skipping invalid entry: ${JSON.stringify(entry)}`);
       continue;
     }
-    
+
     const glossaryEntry: IGlossaryEntry = {
       term: entry.term,
       translations: {
         [targetLanguage || sourceLanguage]: entry.translation,
       },
     };
-    
+
     if (entry.context) {
       glossaryEntry.context = entry.context;
     }
-    
+
     if (entry.notes) {
       glossaryEntry.notes = entry.notes;
     }
-    
+
     glossary.addEntry(glossaryEntry);
     addedCount++;
   }
-  
+
   // Save glossary
   await glossary.save();
   console.log(`Imported ${addedCount} glossary entries successfully`);
@@ -130,25 +130,25 @@ async function importTranslations(
   destPath: string,
   sourceLanguage: string,
   targetLanguage: string,
-  format: 'json' | 'csv' = 'json'
+  format: 'json' | 'csv' = 'json',
 ): Promise<void> {
   console.log(`Importing translations from ${sourcePath} to ${destPath}...`);
-  
+
   const parser = new Parser();
-  
+
   // Read source file
   const content = await fs.promises.readFile(sourcePath, 'utf8');
-  
+
   let translations: Array<{
     key: string;
     value: string;
   }> = [];
-  
+
   // Parse source file based on format
   if (format === 'json') {
     // If it's a flat JSON object
     const data = JSON.parse(content);
-    
+
     if (typeof data === 'object' && !Array.isArray(data)) {
       translations = Object.entries(data).map(([key, value]) => ({
         key,
@@ -168,8 +168,9 @@ async function importTranslations(
         return { key, value };
       });
   }
-  
+
   // Load existing translations if destination file exists
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let existingEntries: any[] = [];
   try {
     if (fs.existsSync(destPath)) {
@@ -179,25 +180,26 @@ async function importTranslations(
     console.warn(`Error loading existing translations: ${error}`);
     console.log('Will create a new file');
   }
-  
+
   // Create a map of existing entries for quick lookup
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingMap = new Map<string, any>();
   existingEntries.forEach((entry) => {
     existingMap.set(entry.key, entry);
   });
-  
+
   // Merge translations with existing entries
   let addedCount = 0;
   let updatedCount = 0;
-  
+
   for (const translation of translations) {
     if (!translation.key || !translation.value) {
       console.warn(`Skipping invalid translation: ${JSON.stringify(translation)}`);
       continue;
     }
-    
+
     const existingEntry = existingMap.get(translation.key);
-    
+
     if (existingEntry) {
       existingEntry.value = translation.value;
       updatedCount++;
@@ -209,12 +211,12 @@ async function importTranslations(
       addedCount++;
     }
   }
-  
+
   // Build and save i18n data
   const i18nData = parser.buildI18nData(existingEntries);
   await parser.saveI18nFile(destPath, i18nData);
-  
+
   console.log(`Imported translations successfully: ${addedCount} added, ${updatedCount} updated`);
 }
 
-export default importData; 
+export default importData;

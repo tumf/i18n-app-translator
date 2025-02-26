@@ -1,11 +1,20 @@
 {
   "name": "i18n-app-translator",
   "version": "1.0.0",
-  "description": "Large-scale translation file multilingualization tool",
+  "description": "AI-powered translation tool for i18n files with vector database support",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
     "i18n-app-translator": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "API.md"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
   },
   "scripts": {
     "build": "tsup",
@@ -18,11 +27,31 @@
     "format": "prettier --write 'src/**/*.ts'",
     "format:check": "prettier --check 'src/**/*.ts'",
     "spell:check": "cspell 'src/**/*.ts'",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "i18n",
+    "translation",
+    "localization",
+    "internationalization",
+    "ai",
+    "openai",
+    "vector-database",
+    "weaviate",
+    "pinecone",
+    "cli"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/i18n-app-translator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/i18n-app-translator/issues"
+  },
+  "homepage": "https://github.com/yourusername/i18n-app-translator#readme",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/jest": "^29.5.14",

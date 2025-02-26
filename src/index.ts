@@ -35,7 +35,7 @@ program
     try {
       // Validate environment variables if using AI services
       validateEnvironmentVars(['OPENAI_API_KEY']);
-      
+
       translate({
         source: options.source,
         dest: options.dest,
@@ -67,7 +67,7 @@ program
     try {
       // Validate environment variables if using AI services
       validateEnvironmentVars(['OPENAI_API_KEY']);
-      
+
       review({
         source: options.source,
         dest: options.dest,
@@ -124,7 +124,7 @@ program
     try {
       // Validate environment variables for vector DB
       validateEnvironmentVars(['OPENAI_API_KEY', 'VECTOR_DB_URL']);
-      
+
       buildVector({
         source: options.source,
         target: options.target,
@@ -149,7 +149,7 @@ program
     try {
       // Validate environment variables for vector DB
       validateEnvironmentVars(['VECTOR_DB_URL']);
-      
+
       search({
         query,
         lang: options.lang,

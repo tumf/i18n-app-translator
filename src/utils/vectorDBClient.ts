@@ -1,7 +1,6 @@
 import type { WeaviateClient } from 'weaviate-ts-client';
 import weaviate from 'weaviate-ts-client';
 import { Pinecone } from '@pinecone-database/pinecone';
-import type { PineconeRecord } from '@pinecone-database/pinecone';
 import { OpenAI } from 'openai';
 
 // Initialize OpenAI client for embeddings
@@ -39,9 +38,9 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
     this.client = weaviate.client({
       scheme: 'https',
       host: process.env.WEAVIATE_URL,
-      apiKey: process.env.WEAVIATE_API_KEY ? 
-        new weaviate.ApiKey(process.env.WEAVIATE_API_KEY) : 
-        undefined,
+      apiKey: process.env.WEAVIATE_API_KEY
+        ? new weaviate.ApiKey(process.env.WEAVIATE_API_KEY)
+        : undefined,
     });
 
     // Check if schema exists, create if not
@@ -117,7 +116,7 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
       model: 'text-embedding-3-small',
       input: sourceText,
     });
-    
+
     const embedding = embeddingResponse.data[0].embedding;
 
     const result = await this.client.graphql
@@ -134,12 +133,14 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
       .do();
 
     const translations = result.data.Get[this.className];
-    
-    return translations.map((item: { sourceText: string; translation: string; _additional: { certainty: number } }) => ({
-      source: item.sourceText,
-      translation: item.translation,
-      similarity: item._additional.certainty,
-    }));
+
+    return translations.map(
+      (item: { sourceText: string; translation: string; _additional: { certainty: number } }) => ({
+        source: item.sourceText,
+        translation: item.translation,
+        similarity: item._additional.certainty,
+      }),
+    );
   }
 
   async close(): Promise<void> {
@@ -168,14 +169,16 @@ export class PineconeVectorDBClient implements IVectorDBClient {
 
     // Use existing index or create a new one
     const indexName = process.env.PINECONE_INDEX || this.indexName;
-    
+
     try {
       // Try to get the index - if it doesn't exist, an error will be thrown
       this.index = this.client.index(indexName);
       await this.index.describeIndexStats(); // Test if the index is accessible
     } catch (error) {
       console.error(`Error accessing Pinecone index: ${error}`);
-      throw new Error(`Failed to access Pinecone index '${indexName}'. Please create the index manually in the Pinecone console.`);
+      throw new Error(
+        `Failed to access Pinecone index '${indexName}'. Please create the index manually in the Pinecone console.`,
+      );
     }
   }
 
@@ -194,12 +197,12 @@ export class PineconeVectorDBClient implements IVectorDBClient {
       model: 'text-embedding-3-small',
       input: sourceText,
     });
-    
+
     const embedding = embeddingResponse.data[0].embedding;
-    
+
     // Create a unique ID
     const id = `${language}_${Buffer.from(sourceText).toString('base64')}`;
-    
+
     await this.index.upsert([
       {
         id,
@@ -228,9 +231,9 @@ export class PineconeVectorDBClient implements IVectorDBClient {
       model: 'text-embedding-3-small',
       input: sourceText,
     });
-    
+
     const embedding = embeddingResponse.data[0].embedding;
-    
+
     const queryResult = await this.index.query({
       vector: embedding,
       topK: limit,
@@ -239,7 +242,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
       },
       includeMetadata: true,
     });
-    
+
     return queryResult.matches.map((match) => ({
       source: match.metadata?.sourceText as string,
       translation: match.metadata?.translation as string,
@@ -253,11 +256,31 @@ export class PineconeVectorDBClient implements IVectorDBClient {
 }
 
 // Factory function to create the appropriate client
-export function createVectorDBClient(): IVectorDBClient {
-  if (process.env.WEAVIATE_URL) {
+export interface IVectorDBOptions {
+  url?: string;
+  apiKey?: string;
+  namespace?: string;
+  indexName?: string;
+}
+
+export function createVectorDBClient(options: IVectorDBOptions = {}): IVectorDBClient {
+  const { url, apiKey, indexName } = options;
+
+  // Override environment variables with provided options
+  const weaviateUrl = url || process.env.WEAVIATE_URL;
+  const pineconeApiKey = apiKey || process.env.PINECONE_API_KEY;
+
+  if (weaviateUrl) {
+    // Set environment variables for the client
+    if (url) process.env.WEAVIATE_URL = url;
+    if (apiKey) process.env.WEAVIATE_API_KEY = apiKey;
+
     return new WeaviateVectorDBClient();
-  } else if (process.env.PINECONE_API_KEY) {
-    return new PineconeVectorDBClient();
+  } else if (pineconeApiKey) {
+    // Set environment variables for the client
+    if (apiKey) process.env.PINECONE_API_KEY = apiKey;
+
+    return new PineconeVectorDBClient(indexName);
   } else {
     throw new Error('No vector database configuration found');
   }
@@ -265,4 +288,4 @@ export function createVectorDBClient(): IVectorDBClient {
 
 export default {
   createVectorDBClient,
-}; 
+};

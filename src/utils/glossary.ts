@@ -55,7 +55,9 @@ export class Glossary {
    * Add or update a glossary entry
    */
   addEntry(entry: IGlossaryEntry): void {
-    const existingIndex = this.entries.findIndex((e) => e.term.toLowerCase() === entry.term.toLowerCase());
+    const existingIndex = this.entries.findIndex(
+      (e) => e.term.toLowerCase() === entry.term.toLowerCase(),
+    );
     if (existingIndex >= 0) {
       this.entries[existingIndex] = {
         ...this.entries[existingIndex],
@@ -91,13 +93,13 @@ export class Glossary {
    */
   getEntriesForLanguage(language: string): Record<string, string> {
     const result: Record<string, string> = {};
-    
+
     this.entries.forEach((entry) => {
       if (entry.translations[language]) {
         result[entry.term] = entry.translations[language];
       }
     });
-    
+
     return result;
   }
 
@@ -106,13 +108,14 @@ export class Glossary {
    */
   searchEntries(searchTerm: string): IGlossaryEntry[] {
     const lowerSearchTerm = searchTerm.toLowerCase();
-    return this.entries.filter((entry) => 
-      entry.term.toLowerCase().includes(lowerSearchTerm) ||
-      Object.values(entry.translations).some((translation) => 
-        translation.toLowerCase().includes(lowerSearchTerm)
-      )
+    return this.entries.filter(
+      (entry) =>
+        entry.term.toLowerCase().includes(lowerSearchTerm) ||
+        Object.values(entry.translations).some((translation) =>
+          translation.toLowerCase().includes(lowerSearchTerm),
+        ),
     );
   }
 }
 
-export default Glossary; 
+export default Glossary;

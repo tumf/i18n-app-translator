@@ -34,39 +34,39 @@ export async function review(options: IReviewOptions): Promise<void> {
   try {
     // Initialize parser
     const parser = new Parser();
-    
+
     // Load source file
     console.log(`Loading source file: ${source}`);
     const sourceEntries = await parser.parseI18nFile(source);
     console.log(`Loaded ${sourceEntries.length} entries from source file`);
-    
+
     // Load target file
     if (!fs.existsSync(dest)) {
       console.error(`Target file ${dest} does not exist. Use translate command first.`);
       process.exit(1);
     }
-    
+
     console.log(`Loading target file: ${dest}`);
     const targetEntries = await parser.parseI18nFile(dest);
     console.log(`Loaded ${targetEntries.length} entries from target file`);
-    
+
     // Compare files to find outdated translations
     const { outdated } = parser.compareI18nFiles(sourceEntries, targetEntries);
-    
+
     // If all flag is set, review all translations
-    const entriesToReview = all 
-      ? sourceEntries.filter((sourceEntry) => 
-          targetEntries.some((targetEntry) => targetEntry.key === sourceEntry.key)
+    const entriesToReview = all
+      ? sourceEntries.filter((sourceEntry) =>
+          targetEntries.some((targetEntry) => targetEntry.key === sourceEntry.key),
         )
       : outdated.map((item) => item.source);
-    
+
     console.log(`Found ${entriesToReview.length} entries to review`);
-    
+
     if (entriesToReview.length === 0) {
       console.log('No entries need review. Exiting.');
       return;
     }
-    
+
     // Initialize vector DB client if enabled
     let vectorDBClient: IVectorDBClient | undefined = undefined;
     if (useVectorDB) {
@@ -81,7 +81,7 @@ export async function review(options: IReviewOptions): Promise<void> {
         vectorDBClient = undefined;
       }
     }
-    
+
     // Initialize glossary if enabled
     let glossary: Glossary | undefined = undefined;
     if (useGlossary) {
@@ -96,31 +96,29 @@ export async function review(options: IReviewOptions): Promise<void> {
         glossary = undefined;
       }
     }
-    
+
     // Initialize translator
     const translator = new Translator(vectorDBClient, glossary);
-    
+
     // Create maps for quick lookup
     const sourceMap = new Map();
     sourceEntries.forEach((entry) => {
       sourceMap.set(entry.key, entry);
     });
-    
+
     const targetMap = new Map();
     targetEntries.forEach((entry) => {
       targetMap.set(entry.key, entry);
     });
-    
+
     // Review entries
     console.log('Starting review...');
-    const reviewResults = await translator.batchReview(
-      entriesToReview,
-      targetEntries,
-      lang,
-      { useGlossary, context }
-    );
+    const reviewResults = await translator.batchReview(entriesToReview, targetEntries, lang, {
+      useGlossary,
+      context,
+    });
     console.log(`Reviewed ${reviewResults.size} entries`);
-    
+
     // Count changes
     let changedCount = 0;
     reviewResults.forEach((result) => {
@@ -129,14 +127,14 @@ export async function review(options: IReviewOptions): Promise<void> {
       }
     });
     console.log(`Improved ${changedCount} translations`);
-    
+
     // Update target entries with improved translations
     const updatedEntries = [...targetEntries];
-    
+
     for (let i = 0; i < updatedEntries.length; i++) {
       const entry = updatedEntries[i];
       const reviewResult = reviewResults.get(entry.key);
-      
+
       if (reviewResult) {
         updatedEntries[i] = {
           ...entry,
@@ -144,13 +142,13 @@ export async function review(options: IReviewOptions): Promise<void> {
         };
       }
     }
-    
+
     // Build and save i18n data
     console.log(`Building and saving i18n data to: ${dest}`);
     const i18nData = parser.buildI18nData(updatedEntries);
     await parser.saveI18nFile(dest, i18nData);
     console.log('Review completed successfully');
-    
+
     // Close vector DB client
     if (vectorDBClient) {
       await vectorDBClient.close();
@@ -161,4 +159,4 @@ export async function review(options: IReviewOptions): Promise<void> {
   }
 }
 
-export default review; 
+export default review;

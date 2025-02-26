@@ -20,8 +20,8 @@ jest.mock('../utils/vectorDBClient');
 jest.mock('../utils/aiClient', () => ({
   getAIClient: jest.fn().mockReturnValue({
     generateTranslation: jest.fn(),
-    reviewTranslation: jest.fn()
-  })
+    reviewTranslation: jest.fn(),
+  }),
 }));
 
 // Mock OpenAI
@@ -30,17 +30,17 @@ jest.mock('openai', () => {
     OpenAI: jest.fn().mockImplementation(() => ({
       embeddings: {
         create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }]
-        })
+          data: [{ embedding: [0.1, 0.2, 0.3] }],
+        }),
       },
       chat: {
         completions: {
           create: jest.fn().mockResolvedValue({
-            choices: [{ message: { content: '{"translated": "翻訳されたテキスト"}' } }]
-          })
-        }
-      }
-    }))
+            choices: [{ message: { content: '{"translated": "翻訳されたテキスト"}' } }],
+          }),
+        },
+      },
+    })),
   };
 });
 
@@ -68,24 +68,24 @@ describe('translate command', () => {
     (Parser as jest.Mock).mockImplementation(() => ({
       parseI18nFile: mockParseI18nFile,
       buildI18nData: mockBuildI18nData,
-      saveI18nFile: mockSaveI18nFile
+      saveI18nFile: mockSaveI18nFile,
     }));
 
     // Setup Translator mock
     (Translator as jest.Mock).mockImplementation(() => ({
-      batchTranslate: mockBatchTranslate
+      batchTranslate: mockBatchTranslate,
     }));
 
     // Setup Glossary mock
     (Glossary as jest.Mock).mockImplementation(() => ({
       load: mockLoad,
-      getAllEntries: mockGetAllEntries
+      getAllEntries: mockGetAllEntries,
     }));
 
     // Setup VectorDBClient mock
     (createVectorDBClient as jest.Mock).mockImplementation(() => ({
       initialize: mockInitialize,
-      close: mockClose
+      close: mockClose,
     }));
 
     // Mock fs.existsSync
@@ -97,18 +97,16 @@ describe('translate command', () => {
     const sourceEntries = [
       { key: 'key1', value: 'value1', context: 'context1' },
       { key: 'key2', value: 'value2', context: 'context2' },
-      { key: 'key3', value: 'value3', context: 'context3' }
+      { key: 'key3', value: 'value3', context: 'context3' },
     ];
 
     // Mock target entries (only has key1)
-    const targetEntries = [
-      { key: 'key1', value: 'target1', context: 'context1' }
-    ];
+    const targetEntries = [{ key: 'key1', value: 'target1', context: 'context1' }];
 
     // Mock translation results
     const translationResults = new Map([
       ['key2', { translated: 'translated2' }],
-      ['key3', { translated: 'translated3' }]
+      ['key3', { translated: 'translated3' }],
     ]);
 
     // Setup mock return values
@@ -126,7 +124,7 @@ describe('translate command', () => {
     await translate({
       source: 'source.json',
       dest: 'target.json',
-      lang: 'ja'
+      lang: 'ja',
     });
 
     // Verify parser was called correctly
@@ -138,31 +136,27 @@ describe('translate command', () => {
     expect(mockBatchTranslate).toHaveBeenCalledWith(
       [
         { key: 'key2', value: 'value2', context: 'context2' },
-        { key: 'key3', value: 'value3', context: 'context3' }
+        { key: 'key3', value: 'value3', context: 'context3' },
       ],
       'ja',
-      { useVectorDB: true, useGlossary: true, context: undefined }
+      { useVectorDB: true, useGlossary: true, context: undefined },
     );
 
     // Verify the result was saved
     expect(mockBuildI18nData).toHaveBeenCalledWith([
       { key: 'key1', value: 'target1', context: 'context1' },
       { key: 'key2', value: 'translated2', context: 'context2' },
-      { key: 'key3', value: 'translated3', context: 'context3' }
+      { key: 'key3', value: 'translated3', context: 'context3' },
     ]);
     expect(mockSaveI18nFile).toHaveBeenCalledWith('target.json', { mock: 'data' });
   });
 
   test('should create new target file if it does not exist', async () => {
     // Mock source entries
-    const sourceEntries = [
-      { key: 'key1', value: 'value1', context: 'context1' }
-    ];
+    const sourceEntries = [{ key: 'key1', value: 'value1', context: 'context1' }];
 
     // Mock translation results
-    const translationResults = new Map([
-      ['key1', { translated: 'translated1' }]
-    ]);
+    const translationResults = new Map([['key1', { translated: 'translated1' }]]);
 
     // Setup mock return values
     (fs.existsSync as jest.Mock).mockReturnValue(false);
@@ -174,7 +168,7 @@ describe('translate command', () => {
     await translate({
       source: 'source.json',
       dest: 'target.json',
-      lang: 'ja'
+      lang: 'ja',
     });
 
     // Verify parser was called correctly
@@ -183,7 +177,7 @@ describe('translate command', () => {
 
     // Verify the result was saved
     expect(mockBuildI18nData).toHaveBeenCalledWith([
-      { key: 'key1', value: 'translated1', context: 'context1' }
+      { key: 'key1', value: 'translated1', context: 'context1' },
     ]);
     expect(mockSaveI18nFile).toHaveBeenCalledWith('target.json', { mock: 'data' });
   });
@@ -196,11 +190,13 @@ describe('translate command', () => {
     console.error = jest.fn();
 
     // Execute and verify
-    await expect(translate({
-      source: 'source.json',
-      dest: 'target.json',
-      lang: 'ja'
-    })).rejects.toThrow('Process.exit called with code 1');
+    await expect(
+      translate({
+        source: 'source.json',
+        dest: 'target.json',
+        lang: 'ja',
+      }),
+    ).rejects.toThrow('Process.exit called with code 1');
 
     // Verify error was logged
     expect(console.error).toHaveBeenCalled();

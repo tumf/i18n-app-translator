@@ -1,26 +1,30 @@
-# i18n-app-translator: 大規模翻訳ファイル多言語化ツール
+# i18n-app-translator: Multilingual Translation Tool for Large-Scale Translation Files
 
-大規模な英語ベース(en.jsonなど)の翻訳ファイルを多言語化するためのCLIツールです。
-単純な逐語訳ではなく、ソースコード上での利用シーン(ボタン、見出し、注意書きなど)を踏まえた文脈情報を用いてLLMに翻訳を依頼します。
-さらに、ベクターデータベースを活用することで、既存の翻訳や用語集から文脈の近い翻訳を検索し、表記揺れを極力抑えた自然な翻訳を実現します。
+A CLI tool for multilingual translation of large English-based translation files (e.g., en.json).
+Instead of simple word-for-word translation, it uses contextual information from the source code (buttons, headings, cautions, etc.) to request translations from LLMs.
+Additionally, by leveraging vector databases, it searches for contextually similar translations from existing translations and glossaries, resulting in natural translations with minimal terminology inconsistencies.
 
-## 主な特徴
+## Key Features
 
-- **LLMを利用した翻訳**: ボタンや見出し等のコンテキストを含め、自然な翻訳を実施
-- **表記揺れ対策**: 用語集(グロッサリ)に加えて、ベクターデータベースで過去の翻訳を参照・活用
-- **既存の翻訳ファイルを継続利用**: すでに部分的に翻訳済みの ja.json などがある場合、その続きを翻訳または改善提案を行う
-- **多言語対応**: ja.json, vi.json, th.json など、対象言語ごとに分かれたファイルを扱う
-- **CLI形式(TypeScript製)**: AI SDK を利用してLLMを切り替えられるように設計
-- **堅牢なエラーハンドリング**: 詳細なエラーメッセージと適切な終了コードを提供
-- **エンドツーエンドテスト**: 全体のワークフローを検証するテストを実装
+- **LLM-powered translation**: Provides natural translations including context such as buttons and headings
+- **Terminology consistency**: Uses glossaries and vector databases to reference and utilize past translations
+- **Continued use of existing translations**: Continues translation or suggests improvements for partially translated files like ja.json
+- **Multilingual support**: Handles files separated by target language such as ja.json, vi.json, th.json
+- **CLI format (TypeScript)**: Designed to switch LLMs using AI SDK
+- **Robust error handling**: Provides detailed error messages and appropriate exit codes
+- **End-to-end testing**: Implements tests to verify the entire workflow
+- **Performance optimization**: Improves processing speed with parallel batch translation
+- **Progress display**: Shows translation progress in real-time
+- **Logging functionality**: Detailed log output and file saving capability
+- **Configuration file support**: Customization of settings via `.i18n-app-translatorrc`
 
-## インストール
+## Installation
 
 ```bash
 npm install -g i18n-app-translator
 ```
 
-または、リポジトリをクローンして開発モードで実行:
+Or clone the repository and run in development mode:
 
 ```bash
 git clone https://github.com/yourusername/i18n-app-translator.git
@@ -29,127 +33,171 @@ npm install
 npm run dev
 ```
 
-## 環境設定
+## Environment Setup
 
-`.env.example` ファイルを `.env` にコピーして、必要な環境変数を設定してください。
+Copy the `.env.example` file to `.env` and set the necessary environment variables.
 
 ```bash
 cp .env.example .env
 ```
 
-必要な環境変数:
+Required environment variables:
 
-- `OPENAI_API_KEY`: OpenAI APIキー（翻訳機能に必要）
-- `VECTOR_DB_URL`: ベクターデータベースのURL（検索機能に必要）
-- `VECTOR_DB_API_KEY`: ベクターデータベースのAPIキー（オプション）
+- `OPENAI_API_KEY`: OpenAI API key (required for translation)
+- `VECTOR_DB_URL`: Vector database URL (required for search)
+- `VECTOR_DB_API_KEY`: Vector database API key (optional)
 
-## 使い方
+## Configuration File
 
-### 翻訳
+Create a `.i18n-app-translatorrc` file to customize default settings.
 
-英語の翻訳ファイルから他言語への翻訳を行います。
+```json
+{
+  "vectorDB": {
+    "enabled": true,
+    "url": "your-vector-db-url",
+    "apiKey": "your-vector-db-api-key",
+    "namespace": "translations"
+  },
+  "glossary": {
+    "enabled": true,
+    "path": "./custom-glossary.json"
+  },
+  "translation": {
+    "concurrency": 5,
+    "showProgress": true,
+    "similarTranslationsLimit": 3
+  },
+  "logging": {
+    "level": 1,
+    "logToFile": true,
+    "logFilePath": "./logs/i18n-app-translator.log",
+    "logToConsole": true,
+    "timestamp": true
+  }
+}
+```
+
+## Usage
+
+### Translation
+
+Translate from English translation files to other languages.
 
 ```bash
 i18n-app-translator translate --lang ja --source ./locales/en.json --dest ./locales/ja.json
 ```
 
-オプション:
-- `--no-vector-db`: ベクターDBを使用しない
-- `--no-glossary`: 用語集を使用しない
-- `--glossary-path <path>`: カスタム用語集のパス
-- `--context <context>`: 翻訳のコンテキスト（例: "button labels"）
+Options:
+- `--no-vector-db`: Don't use vector DB
+- `--no-glossary`: Don't use glossary
+- `--glossary-path <path>`: Custom glossary path
+- `--context <context>`: Translation context (e.g., "button labels")
+- `--concurrency <number>`: Number of parallel processes (default: 5)
+- `--no-progress`: Disable progress display
+- `--config-path <path>`: Custom configuration file path
 
-### 翻訳のレビュー
+### Translation Review
 
-既存の翻訳をレビューし、改善提案を行います。
+Review existing translations and suggest improvements.
 
 ```bash
 i18n-app-translator review --source ./locales/en.json --dest ./locales/ja.json --lang ja --interactive
 ```
 
-オプション:
-- `--no-vector-db`: ベクターDBを使用しない
-- `--no-glossary`: 用語集を使用しない
-- `--glossary-path <path>`: カスタム用語集のパス
-- `--context <context>`: 翻訳のコンテキスト
-- `--all`: 全ての翻訳をレビュー（デフォルトでは古い翻訳のみ）
+Options:
+- `--no-vector-db`: Don't use vector DB
+- `--no-glossary`: Don't use glossary
+- `--glossary-path <path>`: Custom glossary path
+- `--context <context>`: Translation context
+- `--all`: Review all translations (by default, only old translations)
+- `--concurrency <number>`: Number of parallel processes (default: 5)
+- `--no-progress`: Disable progress display
+- `--config-path <path>`: Custom configuration file path
 
-### 既存翻訳のインポート
+### Import Existing Translations
 
-既存の翻訳ファイルや用語集をインポートします。
+Import existing translation files or glossaries.
 
 ```bash
 i18n-app-translator import --source ./locales/ja.json --type translations --dest ./locales/ja.json --target-language ja
 ```
 
-または用語集のインポート:
+Or import a glossary:
 
 ```bash
 i18n-app-translator import --source ./glossary.json --type glossary --glossary-path ./custom-glossary.json
 ```
 
-オプション:
-- `--format <format>`: ソースファイルのフォーマット（"json" または "csv"）
-- `--source-language <code>`: ソース言語コード（デフォルト: "en"）
+Options:
+- `--format <format>`: Source file format ("json" or "csv")
+- `--source-language <code>`: Source language code (default: "en")
+- `--config-path <path>`: Custom configuration file path
 
-### ベクターデータベースの構築
+### Build Vector Database
 
-翻訳のコンテキストを含めてベクターデータベースを構築します。
+Build a vector database including translation context.
 
 ```bash
 i18n-app-translator build-vector --source ./locales/en.json --target ./locales/ja.json --target-language ja --context ./src
 ```
 
-オプション:
-- `--batch-size <size>`: 処理のバッチサイズ（デフォルト: 50）
-- `--source-language <code>`: ソース言語コード（デフォルト: "en"）
+Options:
+- `--batch-size <size>`: Processing batch size (default: 50)
+- `--source-language <code>`: Source language code (default: "en")
+- `--concurrency <number>`: Number of parallel processes (default: 5)
+- `--no-progress`: Disable progress display
+- `--config-path <path>`: Custom configuration file path
 
-### 翻訳の検索
+### Search Translations
 
-ベクターデータベースから類似の翻訳を検索します。
+Search for similar translations from the vector database.
 
 ```bash
 i18n-app-translator search "wallet top up" --lang ja --limit 5
 ```
 
-## エラーハンドリング
+Options:
+- `--config-path <path>`: Custom configuration file path
 
-このツールは堅牢なエラーハンドリングを実装しており、以下のような状況で明確なエラーメッセージを提供します:
+## Error Handling
 
-- 必須パラメータの欠落
-- ファイルが見つからない
-- 無効なファイル形式
-- 環境変数の欠落
-- API接続エラー
+This tool implements robust error handling and provides clear error messages in situations such as:
 
-エラーレベルは以下の4段階で表示されます:
-- INFO: 情報提供のみ
-- WARNING: 警告（処理は続行）
-- ERROR: エラー（処理を中断）
-- FATAL: 致命的なエラー（即座に終了）
+- Missing required parameters
+- File not found
+- Invalid file format
+- Missing environment variables
+- API connection errors
 
-## 開発
+Error levels are displayed in four stages:
+- INFO: Information only
+- WARNING: Warning (processing continues)
+- ERROR: Error (processing stops)
+- FATAL: Fatal error (immediate exit)
+
+## Development
 
 ```bash
-# ビルド
+# Build
 npm run build
 
-# 開発モードで実行
+# Run in development mode
 npm run dev
 
-# テスト
+# Test
 npm test
 
-# エンドツーエンドテスト
+# End-to-end test
 npm run test:e2e
 
-# リント
+# Lint
 npm run lint
 
-# フォーマット
+# Format
 npm run format
 ```
 
-## ライセンス
+## License
 
-ISC
+MIT

@@ -68,9 +68,12 @@ export function handleError(error: unknown): void {
   }
 }
 
-export function validateRequiredParams(params: Record<string, unknown>, requiredParams: string[]): void {
+export function validateRequiredParams(
+  params: Record<string, unknown>,
+  requiredParams: string[],
+): void {
   const missingParams = requiredParams.filter((param) => params[param] === undefined);
-  
+
   if (missingParams.length > 0) {
     throw new AppError(`Missing required parameters: ${missingParams.join(', ')}`, {
       level: ErrorLevel.ERROR,
@@ -90,7 +93,7 @@ export function validateFileExists(filePath: string, fileType: string): void {
 
 export function validateFileFormat(filePath: string, expectedFormat: string): void {
   const extension = path.extname(filePath).toLowerCase();
-  
+
   if (extension !== `.${expectedFormat.toLowerCase()}`) {
     throw new AppError(`Invalid file format. Expected .${expectedFormat} but got ${extension}`, {
       level: ErrorLevel.ERROR,
@@ -101,7 +104,7 @@ export function validateFileFormat(filePath: string, expectedFormat: string): vo
 
 export function validateEnvironmentVars(requiredVars: string[]): void {
   const missingVars = requiredVars.filter((varName) => !process.env[varName]);
-  
+
   if (missingVars.length > 0) {
     throw new AppError(`Missing required environment variables: ${missingVars.join(', ')}`, {
       level: ErrorLevel.ERROR,
@@ -109,4 +112,4 @@ export function validateEnvironmentVars(requiredVars: string[]): void {
       details: 'Please check your .env file or set these variables in your environment.',
     });
   }
-} 
+}

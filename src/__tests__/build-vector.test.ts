@@ -16,8 +16,8 @@ jest.mock('../utils/vectorDBClient');
 jest.mock('../utils/aiClient', () => ({
   getAIClient: jest.fn().mockReturnValue({
     generateTranslation: jest.fn(),
-    reviewTranslation: jest.fn()
-  })
+    reviewTranslation: jest.fn(),
+  }),
 }));
 
 // Mock OpenAI
@@ -26,10 +26,10 @@ jest.mock('openai', () => {
     OpenAI: jest.fn().mockImplementation(() => ({
       embeddings: {
         create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }]
-        })
-      }
-    }))
+          data: [{ embedding: [0.1, 0.2, 0.3] }],
+        }),
+      },
+    })),
   };
 });
 
@@ -51,14 +51,14 @@ describe('build-vector command', () => {
 
     // Setup Parser mock
     (Parser as jest.Mock).mockImplementation(() => ({
-      parseI18nFile: mockParseI18nFile
+      parseI18nFile: mockParseI18nFile,
     }));
 
     // Setup VectorDBClient mock
     (createVectorDBClient as jest.Mock).mockImplementation(() => ({
       initialize: mockInitialize,
       addTranslation: mockAddTranslationPair,
-      close: mockClose
+      close: mockClose,
     }));
 
     // Mock fs.existsSync
@@ -69,13 +69,13 @@ describe('build-vector command', () => {
     // Mock source entries
     const sourceEntries = [
       { key: 'key1', value: 'value1', context: 'context1' },
-      { key: 'key2', value: 'value2', context: 'context2' }
+      { key: 'key2', value: 'value2', context: 'context2' },
     ];
 
     // Mock target entries
     const targetEntries = [
       { key: 'key1', value: 'target1', context: 'context1' },
-      { key: 'key2', value: 'target2', context: 'context2' }
+      { key: 'key2', value: 'target2', context: 'context2' },
     ];
 
     // Setup mock return values
@@ -90,7 +90,7 @@ describe('build-vector command', () => {
       source: 'source.json',
       target: 'target.json',
       targetLanguage: 'ja',
-      batchSize: 10
+      batchSize: 10,
     });
 
     // Verify parser was called correctly
@@ -103,18 +103,8 @@ describe('build-vector command', () => {
 
     // Verify translation pairs were added
     expect(mockAddTranslationPair).toHaveBeenCalledTimes(2);
-    expect(mockAddTranslationPair).toHaveBeenCalledWith(
-      'value1',
-      'target1',
-      'ja',
-      'context1'
-    );
-    expect(mockAddTranslationPair).toHaveBeenCalledWith(
-      'value2',
-      'target2',
-      'ja',
-      'context2'
-    );
+    expect(mockAddTranslationPair).toHaveBeenCalledWith('value1', 'target1', 'ja', 'context1');
+    expect(mockAddTranslationPair).toHaveBeenCalledWith('value2', 'target2', 'ja', 'context2');
 
     // Verify vector DB client was closed
     expect(mockClose).toHaveBeenCalled();
@@ -128,11 +118,13 @@ describe('build-vector command', () => {
     console.error = jest.fn();
 
     // Execute and verify
-    await expect(buildVector({
-      source: 'source.json',
-      target: 'target.json',
-      targetLanguage: 'ja'
-    })).rejects.toThrow('Process.exit called with code 1');
+    await expect(
+      buildVector({
+        source: 'source.json',
+        target: 'target.json',
+        targetLanguage: 'ja',
+      }),
+    ).rejects.toThrow('Process.exit called with code 1');
 
     // Verify error was logged
     expect(console.error).toHaveBeenCalled();
@@ -147,11 +139,13 @@ describe('build-vector command', () => {
     console.error = jest.fn();
 
     // Execute and verify
-    await expect(buildVector({
-      source: 'source.json',
-      target: 'target.json',
-      targetLanguage: 'ja'
-    })).rejects.toThrow('Process.exit called with code 1');
+    await expect(
+      buildVector({
+        source: 'source.json',
+        target: 'target.json',
+        targetLanguage: 'ja',
+      }),
+    ).rejects.toThrow('Process.exit called with code 1');
 
     // Verify error was logged
     expect(console.error).toHaveBeenCalled();

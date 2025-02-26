@@ -32,14 +32,10 @@ export class Parser {
   /**
    * Flatten nested i18n data into an array of entries
    */
-  private flattenI18nData(
-    data: I18nData,
-    prefix = '',
-    entries: I18nEntry[] = []
-  ): I18nEntry[] {
+  private flattenI18nData(data: I18nData, prefix = '', entries: I18nEntry[] = []): I18nEntry[] {
     for (const [key, value] of Object.entries(data)) {
       const fullKey = prefix ? `${prefix}.${key}` : key;
-      
+
       if (typeof value === 'string') {
         entries.push({
           key: fullKey,
@@ -49,7 +45,7 @@ export class Parser {
         this.flattenI18nData(value, fullKey, entries);
       }
     }
-    
+
     return entries;
   }
 
@@ -59,7 +55,7 @@ export class Parser {
   async extractKeysFromSourceCode(
     sourceDir: string,
     patterns: string[] = ['**/*.{js,jsx,ts,tsx}'],
-    excludePatterns: string[] = ['**/node_modules/**', '**/dist/**', '**/build/**']
+    excludePatterns: string[] = ['**/node_modules/**', '**/dist/**', '**/build/**'],
   ): Promise<I18nEntry[]> {
     const entries: I18nEntry[] = [];
     const files = await glob(patterns, {
@@ -71,15 +67,15 @@ export class Parser {
     for (const file of files) {
       const content = await fs.promises.readFile(file, 'utf8');
       const relativeFile = path.relative(sourceDir, file);
-      
+
       // Extract keys from t function calls: t('key')
       const tFunctionRegex = /t\(\s*['"]([^'"]+)['"]/g;
       let match;
-      
+
       while ((match = tFunctionRegex.exec(content)) !== null) {
         const key = match[1];
         const lineNumber = this.getLineNumber(content, match.index);
-        
+
         entries.push({
           key,
           value: '', // Value will be filled from i18n files
@@ -87,7 +83,7 @@ export class Parser {
           line: lineNumber,
         });
       }
-      
+
       // Extract keys from useTranslation hook: const { t } = useTranslation()
       // and then find all t('key') usages
       if (content.includes('useTranslation')) {
@@ -95,16 +91,16 @@ export class Parser {
         if (hookRegex.test(content)) {
           // Reset regex to search from beginning
           tFunctionRegex.lastIndex = 0;
-          
+
           while ((match = tFunctionRegex.exec(content)) !== null) {
             const key = match[1];
             const lineNumber = this.getLineNumber(content, match.index);
-            
+
             // Check if this key is already added
-            const existingEntry = entries.find((e) => 
-              e.key === key && e.file === relativeFile && e.line === lineNumber
+            const existingEntry = entries.find(
+              (e) => e.key === key && e.file === relativeFile && e.line === lineNumber,
             );
-            
+
             if (!existingEntry) {
               entries.push({
                 key,
@@ -117,7 +113,7 @@ export class Parser {
         }
       }
     }
-    
+
     return entries;
   }
 
@@ -134,24 +130,24 @@ export class Parser {
    */
   compareI18nFiles(
     sourceEntries: I18nEntry[],
-    targetEntries: I18nEntry[]
+    targetEntries: I18nEntry[],
   ): {
     missing: I18nEntry[];
     outdated: { source: I18nEntry; target: I18nEntry }[];
   } {
     const missing: I18nEntry[] = [];
     const outdated: { source: I18nEntry; target: I18nEntry }[] = [];
-    
+
     // Create a map of target entries for quick lookup
     const targetMap = new Map<string, I18nEntry>();
     targetEntries.forEach((entry) => {
       targetMap.set(entry.key, entry);
     });
-    
+
     // Find missing and outdated entries
     for (const sourceEntry of sourceEntries) {
       const targetEntry = targetMap.get(sourceEntry.key);
-      
+
       if (!targetEntry) {
         // Missing translation
         missing.push(sourceEntry);
@@ -160,7 +156,7 @@ export class Parser {
         outdated.push({ source: sourceEntry, target: targetEntry });
       }
     }
-    
+
     return { missing, outdated };
   }
 
@@ -169,11 +165,11 @@ export class Parser {
    */
   buildI18nData(entries: I18nEntry[]): I18nData {
     const data: I18nData = {};
-    
+
     for (const entry of entries) {
       const parts = entry.key.split('.');
       let current = data;
-      
+
       for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
         if (!current[part]) {
@@ -181,11 +177,11 @@ export class Parser {
         }
         current = current[part] as I18nData;
       }
-      
+
       const lastPart = parts[parts.length - 1];
       current[lastPart] = entry.value;
     }
-    
+
     return data;
   }
 
@@ -198,12 +194,8 @@ export class Parser {
       if (!fs.existsSync(dir)) {
         await fs.promises.mkdir(dir, { recursive: true });
       }
-      
-      await fs.promises.writeFile(
-        filePath,
-        JSON.stringify(data, null, 2),
-        'utf8'
-      );
+
+      await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
     } catch (error) {
       console.error(`Error saving i18n file ${filePath}: ${error}`);
       throw error;
@@ -211,4 +203,4 @@ export class Parser {
   }
 }
 
-export default Parser; 
+export default Parser;
