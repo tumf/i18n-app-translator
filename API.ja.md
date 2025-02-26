@@ -16,20 +16,20 @@ interface IParserOptions {
 
 class Parser {
   constructor(options: IParserOptions);
-  
+
   // 翻訳ファイルを読み込む
   loadSource(): Record<string, string>;
   loadTarget(): Record<string, string>;
-  
+
   // 翻訳ファイルを保存する
   saveTarget(translations: Record<string, string>): void;
-  
+
   // 未翻訳のキーを取得する
   getUntranslatedKeys(): string[];
-  
+
   // 古い翻訳を取得する
   getOutdatedTranslations(): Record<string, { source: string; target: string }>;
-  
+
   // ソースコードからキーの使用コンテキストを抽出する
   extractKeyContext(key: string, contextDir: string): string[];
 }
@@ -54,19 +54,19 @@ interface IGlossaryOptions {
 
 class Glossary {
   constructor(options: IGlossaryOptions);
-  
+
   // 用語集を読み込む
   load(): IGlossaryEntry[];
-  
+
   // 用語集を保存する
   save(entries: IGlossaryEntry[]): void;
-  
+
   // 用語を追加する
   addEntry(entry: IGlossaryEntry): void;
-  
+
   // 用語を検索する
   findTerm(term: string): IGlossaryEntry | undefined;
-  
+
   // 文字列内の用語を置換する
   applyToString(text: string): string;
 }
@@ -88,19 +88,26 @@ interface IVectorDBClient {
     text: string,
     translation: string,
     language: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): Promise<string>;
-  
+
   // 類似のベクターを検索する
   searchSimilar(
     text: string,
     language: string,
-    limit?: number
-  ): Promise<Array<{ text: string; translation: string; score: number; metadata?: Record<string, unknown> }>>;
-  
+    limit?: number,
+  ): Promise<
+    Array<{ text: string; translation: string; score: number; metadata?: Record<string, unknown> }>
+  >;
+
   // バッチ処理でベクターを保存する
   storeBatch(
-    items: Array<{ text: string; translation: string; language: string; metadata?: Record<string, unknown> }>
+    items: Array<{
+      text: string;
+      translation: string;
+      language: string;
+      metadata?: Record<string, unknown>;
+    }>,
   ): Promise<string[]>;
 }
 
@@ -123,21 +130,21 @@ interface IAIClient {
     text: string,
     sourceLanguage: string,
     targetLanguage: string,
-    context?: string
+    context?: string,
   ): Promise<string>;
-  
+
   // 翻訳を改善する
   improveTranslation(
     sourceText: string,
     currentTranslation: string,
     targetLanguage: string,
-    context?: string
+    context?: string,
   ): Promise<string>;
-  
+
   // 翻訳の一貫性をチェックする
   checkConsistency(
     translations: Record<string, string>,
-    targetLanguage: string
+    targetLanguage: string,
   ): Promise<Record<string, string>>;
 }
 
@@ -160,18 +167,22 @@ interface ITranslatorOptions {
 
 class Translator {
   constructor(options: ITranslatorOptions);
-  
+
   // テキストを翻訳する
   translateText(text: string, key?: string): Promise<string>;
-  
+
   // 翻訳ファイル全体を翻訳する
   translateFile(sourcePath: string, targetPath: string): Promise<void>;
-  
+
   // 翻訳を改善する
   improveTranslation(sourceText: string, currentTranslation: string, key?: string): Promise<string>;
-  
+
   // 翻訳ファイルをレビューする
-  reviewFile(sourcePath: string, targetPath: string, all?: boolean): Promise<Record<string, { original: string; improved: string }>>;
+  reviewFile(
+    sourcePath: string,
+    targetPath: string,
+    all?: boolean,
+  ): Promise<Record<string, { original: string; improved: string }>>;
 }
 ```
 
@@ -277,7 +288,7 @@ class AppError extends Error {
   exit: boolean;
   code: number;
   details?: unknown;
-  
+
   constructor(message: string, options?: IErrorOptions);
 }
 
@@ -303,12 +314,12 @@ function validateEnvironmentVars(requiredVars: string[]): void;
 program
   .name('i18n-app-translator')
   .description('CLI for multi-language i18n with LLM & Vector DB')
-  .version('1.0.0'); 
+  .version('1.0.0');
 
 // 各コマンドの登録
 // translate, review, import, build-vector, search
 
 // グローバルエラーハンドリング
-process.on('uncaughtException', handleError); 
-process.on('unhandledRejection', handleError); 
+process.on('uncaughtException', handleError);
+process.on('unhandledRejection', handleError);
 ```
