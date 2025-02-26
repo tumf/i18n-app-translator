@@ -1,8 +1,15 @@
 import { OpenAI } from 'openai';
+import dotenv from 'dotenv';
 
-// Initialize OpenAI client
+// Load environment variables directly in this module
+dotenv.config();
+
+// Check if mock mode is enabled
+const MOCK_MODE = process.env.MOCK_MODE === 'true';
+
+// Initialize OpenAI client with a default API key if in mock mode
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'sk-mock-key-for-testing',
 });
 
 // LangChain OpenAI client can be initialized when needed
@@ -22,6 +29,15 @@ export async function generateTranslation(
   similarTranslations?: Array<{ source: string; translation: string }>,
   glossary?: Record<string, string>,
 ): Promise<string> {
+  // Return mock response if in mock mode
+  if (MOCK_MODE) {
+    console.log(`[MOCK] Translating: "${sourceText}" to ${targetLanguage}`);
+    if (context) {
+      console.log(`[MOCK] Context: ${context}`);
+    }
+    return `[${targetLanguage}] ${sourceText}`;
+  }
+
   // Build prompt
   let prompt = `Translate the following text from English to ${targetLanguage}:\n\n${sourceText}\n\n`;
 
@@ -76,6 +92,18 @@ export async function reviewTranslation(
   context?: string,
   glossary?: Record<string, string>,
 ): Promise<{ improved: string; changes: string }> {
+  // Return mock response if in mock mode
+  if (MOCK_MODE) {
+    console.log(`[MOCK] Reviewing: "${existingTranslation}" for "${sourceText}" in ${targetLanguage}`);
+    if (context) {
+      console.log(`[MOCK] Context: ${context}`);
+    }
+    return {
+      improved: existingTranslation,
+      changes: '[MOCK] No changes needed',
+    };
+  }
+
   // Build prompt
   let prompt = `Review and improve the following translation from English to ${targetLanguage}:\n\n`;
   prompt += `Original (English): ${sourceText}\n`;

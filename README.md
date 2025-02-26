@@ -135,6 +135,7 @@ Options:
 - `--no-glossary`: Don't use glossary
 - `--glossary-path <path>`: Custom glossary path
 - `--context <context>`: Translation context (e.g., "button labels")
+- `--context-from-code <path>`: Extract usage context of translation keys from files in the specified directory
 - `--concurrency <number>`: Number of parallel processes (default: 5)
 - `--no-progress`: Disable progress display
 - `--config-path <path>`: Custom configuration file path

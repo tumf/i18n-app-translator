@@ -4,6 +4,7 @@ import { Parser } from '../utils/parser';
 import { Translator } from '../utils/translator';
 import { Glossary } from '../utils/glossary';
 import { createVectorDBClient } from '../utils/vectorDBClient';
+import { ContextExtractor } from '../utils/contextExtractor';
 import { jest } from '@jest/globals';
 
 // Mock process.exit
@@ -17,6 +18,7 @@ jest.mock('../utils/parser');
 jest.mock('../utils/translator');
 jest.mock('../utils/glossary');
 jest.mock('../utils/vectorDBClient');
+jest.mock('../utils/contextExtractor');
 jest.mock('../utils/aiClient', () => ({
   getAIClient: jest.fn().mockReturnValue({
     generateTranslation: jest.fn(),
@@ -54,6 +56,8 @@ describe('translate command', () => {
   const mockGetAllEntries = jest.fn();
   const mockInitialize = jest.fn();
   const mockClose = jest.fn();
+  const mockExtractContextForKeys = jest.fn();
+  const mockFormatContextString = jest.fn();
 
   beforeEach(() => {
     // Reset mocks
@@ -86,6 +90,12 @@ describe('translate command', () => {
     (createVectorDBClient as jest.Mock).mockImplementation(() => ({
       initialize: mockInitialize,
       close: mockClose,
+    }));
+
+    // Setup ContextExtractor mock
+    (ContextExtractor as jest.Mock).mockImplementation(() => ({
+      extractContextForKeys: mockExtractContextForKeys.mockResolvedValue(new Map()),
+      formatContextString: mockFormatContextString.mockReturnValue('Mocked context from code'),
     }));
 
     // Mock fs.existsSync
@@ -201,5 +211,59 @@ describe('translate command', () => {
     // Verify error was logged
     expect(console.error).toHaveBeenCalled();
     expect(mockExit).toHaveBeenCalledWith(1);
+  });
+
+  test('should extract context from code when contextFromCode option is provided', async () => {
+    // Mock source entries
+    const sourceEntries = [
+      { key: 'key1', value: 'value1', context: 'context1' },
+      { key: 'key2', value: 'value2', context: 'context2' },
+    ];
+
+    // Mock target entries (empty)
+    const targetEntries: any[] = [];
+
+    // Mock translation results
+    const translationResults = new Map([
+      ['key1', { translated: 'translated1' }],
+      ['key2', { translated: 'translated2' }],
+    ]);
+
+    // Setup mock return values
+    mockParseI18nFile.mockImplementation((file: any) => {
+      if (String(file).includes('source')) return Promise.resolve(sourceEntries);
+      if (String(file).includes('target')) return Promise.resolve(targetEntries);
+      return Promise.resolve([]);
+    });
+
+    mockBatchTranslate.mockResolvedValue(translationResults as any);
+    mockGetAllEntries.mockReturnValue([]);
+    mockBuildI18nData.mockReturnValue({ mock: 'data' });
+
+    // Call the translate function with contextFromCode option
+    await translate({
+      source: 'source.json',
+      dest: 'target.json',
+      lang: 'ja',
+      contextFromCode: './src',
+    });
+
+    // Verify ContextExtractor was instantiated
+    expect(ContextExtractor).toHaveBeenCalledWith('./src');
+
+    // Verify extractContextForKeys was called
+    expect(mockExtractContextForKeys).toHaveBeenCalled();
+
+    // Verify formatContextString was called
+    expect(mockFormatContextString).toHaveBeenCalled();
+
+    // Verify translator was called with context that includes the extracted context
+    expect(mockBatchTranslate).toHaveBeenCalledWith(
+      expect.anything(),
+      'ja',
+      expect.objectContaining({
+        context: expect.stringContaining('Mocked context from code'),
+      }),
+    );
   });
 });

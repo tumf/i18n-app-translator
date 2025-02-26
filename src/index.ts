@@ -31,6 +31,10 @@ program
   .option('--no-glossary', 'Disable glossary usage')
   .option('--glossary-path <path>', 'Custom glossary path')
   .option('--context <context>', 'Context for translations (e.g. "button labels")')
+  .option('--context-from-code <path>', 'Extract context automatically from files in the specified directory')
+  .option('--concurrency <number>', 'Number of concurrent translations', '5')
+  .option('--no-progress', 'Disable progress display')
+  .option('--config-path <path>', 'Custom config file path')
   .action((options) => {
     try {
       // Validate environment variables if using AI services
@@ -44,6 +48,10 @@ program
         useGlossary: options.glossary !== false,
         glossaryPath: options.glossaryPath,
         context: options.context,
+        contextFromCode: options.contextFromCode,
+        concurrency: parseInt(options.concurrency, 10),
+        showProgress: options.progress !== false,
+        configPath: options.configPath,
       });
     } catch (error) {
       handleError(error);

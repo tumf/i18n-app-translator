@@ -135,6 +135,7 @@ i18n-app-translator translate --lang ja --source ./locales/en.json --dest ./loca
 - `--no-glossary`: 用語集を使用しない
 - `--glossary-path <path>`: カスタム用語集のパス
 - `--context <context>`: 翻訳のコンテキスト（例: "button labels"）
+- `--context-from-code <path>`: 指定したディレクトリ内のファイルから翻訳キーの使用コンテキストを自動抽出する
 - `--concurrency <number>`: 並列処理数（デフォルト: 5）
 - `--no-progress`: 進捗表示を無効化
 - `--config-path <path>`: カスタム設定ファイルのパス

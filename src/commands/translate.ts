@@ -5,6 +5,7 @@ import { Translator } from '../utils/translator';
 import { Glossary } from '../utils/glossary';
 import { createVectorDBClient } from '../utils/vectorDBClient';
 import type { IVectorDBClient } from '../utils/vectorDBClient';
+import { ContextExtractor } from '../utils/contextExtractor';
 import configManager from '../utils/config';
 import logger from '../utils/logger';
 
@@ -16,6 +17,7 @@ export interface ITranslateOptions {
   useGlossary?: boolean;
   glossaryPath?: string;
   context?: string;
+  contextFromCode?: string;
   concurrency?: number;
   showProgress?: boolean;
   configPath?: string;
@@ -41,6 +43,7 @@ export async function translate(options: ITranslateOptions): Promise<void> {
     useGlossary = config.glossary?.enabled ?? true,
     glossaryPath = config.glossary?.path ?? path.join(process.cwd(), 'glossary.json'),
     context,
+    contextFromCode,
     concurrency = config.translation?.concurrency ?? 5,
     showProgress = config.translation?.showProgress ?? true,
   } = options;
@@ -86,6 +89,44 @@ export async function translate(options: ITranslateOptions): Promise<void> {
       return;
     }
 
+    // Extract context from code if specified
+    let extractedContext = '';
+    if (contextFromCode) {
+      try {
+        logger.info(`Extracting context from code: ${contextFromCode}`);
+        const contextExtractor = new ContextExtractor(contextFromCode);
+        
+        // Get keys that need translation
+        const keysToTranslate = entriesToTranslate.map((entry) => entry.key);
+        
+        // Extract context for these keys
+        const keyContexts = await contextExtractor.extractContextForKeys(keysToTranslate);
+        
+        // Format context as string
+        extractedContext = contextExtractor.formatContextString(keyContexts);
+        
+        logger.info('Context extraction completed');
+        
+        if (extractedContext) {
+          logger.info('Successfully extracted context from code');
+        } else {
+          logger.warn('No context could be extracted from the codebase');
+        }
+      } catch (error) {
+        logger.warn(`Error extracting context from code: ${error}`);
+        logger.info('Will proceed without code context');
+      }
+    }
+
+    // Combine manually specified context with extracted context
+    let combinedContext = context || '';
+    if (extractedContext) {
+      if (combinedContext) {
+        combinedContext += '\n\n';
+      }
+      combinedContext += 'Context from codebase:\n' + extractedContext;
+    }
+
     // Initialize vector DB client if enabled
     let vectorDBClient: IVectorDBClient | undefined = undefined;
     if (useVectorDB) {
@@ -128,7 +169,7 @@ export async function translate(options: ITranslateOptions): Promise<void> {
     const translationResults = await translator.batchTranslate(entriesToTranslate, lang, {
       useVectorDB,
       useGlossary,
-      context,
+      context: combinedContext,
       concurrency,
       showProgress,
       similarTranslationsLimit: config.translation?.similarTranslationsLimit ?? 3,

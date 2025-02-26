@@ -2,6 +2,10 @@ import type { WeaviateClient } from 'weaviate-ts-client';
 import weaviate from 'weaviate-ts-client';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { OpenAI } from 'openai';
+import dotenv from 'dotenv';
+
+// Load environment variables directly in this module
+dotenv.config();
 
 // Initialize OpenAI client for embeddings
 const openai = new OpenAI({
