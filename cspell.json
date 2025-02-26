@@ -1,0 +1,21 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "langchain",
+    "openai",
+    "pinecone",
+    "weaviate",
+    "tsup",
+    "upsert",
+    "agentic",
+    "embeddings"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.json",
+    "*.lock"
+  ]
+} 

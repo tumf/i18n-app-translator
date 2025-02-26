@@ -1,0 +1,137 @@
+[
+  {
+    "term": "Submit",
+    "translations": {
+      "ja": "送信",
+      "fr": "Soumettre",
+      "es": "Enviar"
+    },
+    "context": "button"
+  },
+  {
+    "term": "Cancel",
+    "translations": {
+      "ja": "キャンセル",
+      "fr": "Annuler",
+      "es": "Cancelar"
+    },
+    "context": "button"
+  },
+  {
+    "term": "Save",
+    "translations": {
+      "ja": "保存",
+      "fr": "Enregistrer",
+      "es": "Guardar"
+    },
+    "context": "button"
+  },
+  {
+    "term": "Delete",
+    "translations": {
+      "ja": "削除",
+      "fr": "Supprimer",
+      "es": "Eliminar"
+    },
+    "context": "button"
+  },
+  {
+    "term": "Edit",
+    "translations": {
+      "ja": "編集",
+      "fr": "Modifier",
+      "es": "Editar"
+    },
+    "context": "button"
+  },
+  {
+    "term": "Login",
+    "translations": {
+      "ja": "ログイン",
+      "fr": "Connexion",
+      "es": "Iniciar sesión"
+    },
+    "context": "auth"
+  },
+  {
+    "term": "Password",
+    "translations": {
+      "ja": "パスワード",
+      "fr": "Mot de passe",
+      "es": "Contraseña"
+    },
+    "context": "auth"
+  },
+  {
+    "term": "Email",
+    "translations": {
+      "ja": "メールアドレス",
+      "fr": "Adresse e-mail",
+      "es": "Correo electrónico"
+    },
+    "context": "auth"
+  },
+  {
+    "term": "Settings",
+    "translations": {
+      "ja": "設定",
+      "fr": "Paramètres",
+      "es": "Configuración"
+    },
+    "context": "navigation"
+  },
+  {
+    "term": "Notifications",
+    "translations": {
+      "ja": "通知",
+      "fr": "Notifications",
+      "es": "Notificaciones"
+    },
+    "context": "ui"
+  },
+  {
+    "term": "Dashboard",
+    "translations": {
+      "ja": "ダッシュボード",
+      "fr": "Tableau de bord",
+      "es": "Panel de control"
+    },
+    "context": "navigation"
+  },
+  {
+    "term": "Profile",
+    "translations": {
+      "ja": "プロフィール",
+      "fr": "Profil",
+      "es": "Perfil"
+    },
+    "context": "user"
+  },
+  {
+    "term": "Error",
+    "translations": {
+      "ja": "エラー",
+      "fr": "Erreur",
+      "es": "Error"
+    },
+    "context": "message"
+  },
+  {
+    "term": "Success",
+    "translations": {
+      "ja": "成功",
+      "fr": "Succès",
+      "es": "Éxito"
+    },
+    "context": "message"
+  },
+  {
+    "term": "Loading",
+    "translations": {
+      "ja": "読み込み中",
+      "fr": "Chargement",
+      "es": "Cargando"
+    },
+    "context": "ui"
+  }
+] 

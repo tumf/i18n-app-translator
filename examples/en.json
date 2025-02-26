@@ -1,0 +1,121 @@
+{
+  "common": {
+    "buttons": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "back": "Back",
+      "next": "Next"
+    },
+    "messages": {
+      "loading": "Loading...",
+      "error": "An error occurred. Please try again.",
+      "success": "Operation completed successfully.",
+      "confirmation": "Are you sure you want to proceed?",
+      "required": "This field is required.",
+      "invalid": "Invalid input."
+    },
+    "labels": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "address": "Address",
+      "phone": "Phone Number",
+      "date": "Date",
+      "time": "Time"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "rememberMe": "Remember me"
+    },
+    "register": {
+      "title": "Create an Account",
+      "namePlaceholder": "Enter your name",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "termsAgree": "I agree to the Terms and Conditions"
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "instruction": "Enter your email address and we'll send you a link to reset your password.",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Send Reset Link",
+      "backToLogin": "Back to Login"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome, {name}!",
+    "summary": "Here's a summary of your activity",
+    "stats": {
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "total": "Total"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllAsRead": "Mark all as read",
+      "empty": "No new notifications"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "newItem": "Create New Item",
+      "viewReports": "View Reports",
+      "settings": "Settings"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile Settings",
+      "updatePhoto": "Update Profile Photo",
+      "changePassword": "Change Password",
+      "twoFactor": "Two-Factor Authentication",
+      "language": "Language Preference",
+      "timezone": "Timezone"
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "email": "Email Notifications",
+      "push": "Push Notifications",
+      "sms": "SMS Notifications",
+      "marketing": "Marketing Communications"
+    },
+    "privacy": {
+      "title": "Privacy Settings",
+      "dataSharing": "Data Sharing",
+      "cookiePreferences": "Cookie Preferences",
+      "deleteAccount": "Delete Account"
+    }
+  },
+  "errors": {
+    "404": {
+      "title": "Page Not Found",
+      "message": "The page you are looking for does not exist.",
+      "action": "Go to Homepage"
+    },
+    "500": {
+      "title": "Server Error",
+      "message": "Something went wrong on our end. Please try again later.",
+      "action": "Refresh Page"
+    },
+    "offline": {
+      "title": "You're Offline",
+      "message": "Please check your internet connection and try again.",
+      "action": "Retry"
+    }
+  }
+}
