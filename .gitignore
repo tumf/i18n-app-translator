@@ -27,8 +27,4 @@ yarn-error.log*
 # OS specific
 .DS_Store
 Thumbs.db
-test-data/en.json
-test-data/header.jsx
-test-data/ja.json
-test-data/ja2.json
-test-data/sample-component.jsx
+test-data/
