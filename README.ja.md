@@ -77,7 +77,8 @@ Weaviateを使用する場合の設定例:
   "translation": {
     "concurrency": 5,
     "showProgress": true,
-    "similarTranslationsLimit": 3
+    "similarTranslationsLimit": 3,
+    "debug": false
   },
   "logging": {
     "level": 1,
@@ -107,7 +108,8 @@ Pineconeを使用する場合の設定例:
   "translation": {
     "concurrency": 5,
     "showProgress": true,
-    "similarTranslationsLimit": 3
+    "similarTranslationsLimit": 3,
+    "debug": false
   },
   "logging": {
     "level": 1,
@@ -139,6 +141,7 @@ i18n-app-translator translate --lang ja --source ./locales/en.json --dest ./loca
 - `--concurrency <number>`: 並列処理数（デフォルト: 5）
 - `--no-progress`: 進捗表示を無効化
 - `--config-path <path>`: カスタム設定ファイルのパス
+- `--debug`: デバッグ用に翻訳プロンプトを表示する
 
 ### 翻訳のレビュー
 

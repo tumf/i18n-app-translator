@@ -18,6 +18,7 @@ export interface ITranslationConfig {
   concurrency: number;
   showProgress: boolean;
   similarTranslationsLimit: number;
+  debug?: boolean;
 }
 
 export interface ILoggingConfig {
@@ -54,6 +55,7 @@ export const DEFAULT_CONFIG: IConfig = {
     concurrency: 5,
     showProgress: true,
     similarTranslationsLimit: 3,
+    debug: false,
   },
   logging: {
     level: LogLevel.INFO,

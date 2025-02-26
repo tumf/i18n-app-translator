@@ -11,6 +11,7 @@ export interface ITranslationOptions {
   context?: string;
   concurrency?: number;
   showProgress?: boolean;
+  debug?: boolean;
 }
 
 export interface ITranslationResult {
@@ -42,6 +43,7 @@ export class Translator {
       useGlossary = true,
       similarTranslationsLimit = 3,
       context = entry.context,
+      debug = false,
     } = options;
 
     let similarTranslations;
@@ -83,6 +85,7 @@ export class Translator {
       context,
       similarTranslations,
       glossaryTerms,
+      debug,
     );
 
     // Store translation in vector DB if enabled

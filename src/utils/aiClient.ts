@@ -28,6 +28,7 @@ export async function generateTranslation(
   context?: string,
   similarTranslations?: Array<{ source: string; translation: string }>,
   glossary?: Record<string, string>,
+  debug?: boolean,
 ): Promise<string> {
   // Return mock response if in mock mode
   if (MOCK_MODE) {
@@ -65,6 +66,13 @@ export async function generateTranslation(
   }
 
   prompt += 'Provide only the translation without any additional text or explanations.';
+
+  // Log the prompt for debugging
+  if (debug) {
+    console.log('=== TRANSLATION PROMPT ===');
+    console.log(prompt);
+    console.log('=========================');
+  }
 
   // Call OpenAI API
   const response = await openai.chat.completions.create({

@@ -77,7 +77,8 @@ Example configuration for Weaviate:
   "translation": {
     "concurrency": 5,
     "showProgress": true,
-    "similarTranslationsLimit": 3
+    "similarTranslationsLimit": 3,
+    "debug": false
   },
   "logging": {
     "level": 1,
@@ -107,7 +108,8 @@ Example configuration for Pinecone:
   "translation": {
     "concurrency": 5,
     "showProgress": true,
-    "similarTranslationsLimit": 3
+    "similarTranslationsLimit": 3,
+    "debug": false
   },
   "logging": {
     "level": 1,
@@ -139,6 +141,7 @@ Options:
 - `--concurrency <number>`: Number of parallel processes (default: 5)
 - `--no-progress`: Disable progress display
 - `--config-path <path>`: Custom configuration file path
+- `--debug`: Show translation prompts for debugging
 
 ### Translation Review
 

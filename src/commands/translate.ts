@@ -21,6 +21,7 @@ export interface ITranslateOptions {
   concurrency?: number;
   showProgress?: boolean;
   configPath?: string;
+  debug?: boolean;
 }
 
 export async function translate(options: ITranslateOptions): Promise<void> {
@@ -46,6 +47,7 @@ export async function translate(options: ITranslateOptions): Promise<void> {
     contextFromCode,
     concurrency = config.translation?.concurrency ?? 5,
     showProgress = config.translation?.showProgress ?? true,
+    debug = config.translation?.debug ?? false,
   } = options;
 
   logger.info(`Translating from ${source} to ${dest} (${lang})...`);
@@ -173,6 +175,7 @@ export async function translate(options: ITranslateOptions): Promise<void> {
       concurrency,
       showProgress,
       similarTranslationsLimit: config.translation?.similarTranslationsLimit ?? 3,
+      debug,
     });
     logger.info(`Translated ${translationResults.size} entries`);
 

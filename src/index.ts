@@ -35,6 +35,7 @@ program
   .option('--concurrency <number>', 'Number of concurrent translations', '5')
   .option('--no-progress', 'Disable progress display')
   .option('--config-path <path>', 'Custom config file path')
+  .option('--debug', 'Enable debug mode to show translation prompts')
   .action((options) => {
     try {
       // Validate environment variables if using AI services
@@ -52,6 +53,7 @@ program
         concurrency: parseInt(options.concurrency, 10),
         showProgress: options.progress !== false,
         configPath: options.configPath,
+        debug: options.debug || false,
       });
     } catch (error) {
       handleError(error);
