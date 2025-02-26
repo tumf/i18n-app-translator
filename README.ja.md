@@ -89,6 +89,7 @@ i18n-app-translator translate --lang ja --source ./locales/en.json --dest ./loca
 ```
 
 オプション:
+
 - `--no-vector-db`: ベクターDBを使用しない
 - `--no-glossary`: 用語集を使用しない
 - `--glossary-path <path>`: カスタム用語集のパス
@@ -106,6 +107,7 @@ i18n-app-translator review --source ./locales/en.json --dest ./locales/ja.json -
 ```
 
 オプション:
+
 - `--no-vector-db`: ベクターDBを使用しない
 - `--no-glossary`: 用語集を使用しない
 - `--glossary-path <path>`: カスタム用語集のパス
@@ -130,6 +132,7 @@ i18n-app-translator import --source ./glossary.json --type glossary --glossary-p
 ```
 
 オプション:
+
 - `--format <format>`: ソースファイルのフォーマット（"json" または "csv"）
 - `--source-language <code>`: ソース言語コード（デフォルト: "en"）
 - `--config-path <path>`: カスタム設定ファイルのパス
@@ -143,6 +146,7 @@ i18n-app-translator build-vector --source ./locales/en.json --target ./locales/j
 ```
 
 オプション:
+
 - `--batch-size <size>`: 処理のバッチサイズ（デフォルト: 50）
 - `--source-language <code>`: ソース言語コード（デフォルト: "en"）
 - `--concurrency <number>`: 並列処理数（デフォルト: 5）
@@ -158,6 +162,7 @@ i18n-app-translator search "wallet top up" --lang ja --limit 5
 ```
 
 オプション:
+
 - `--config-path <path>`: カスタム設定ファイルのパス
 
 ## エラーハンドリング
@@ -171,6 +176,7 @@ i18n-app-translator search "wallet top up" --lang ja --limit 5
 - API接続エラー
 
 エラーレベルは以下の4段階で表示されます:
+
 - INFO: 情報提供のみ
 - WARNING: 警告（処理は続行）
 - ERROR: エラー（処理を中断）
@@ -200,4 +206,4 @@ npm run format
 
 ## ライセンス
 
-MIT 
+MIT

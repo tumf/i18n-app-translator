@@ -89,6 +89,7 @@ i18n-app-translator translate --lang ja --source ./locales/en.json --dest ./loca
 ```
 
 Options:
+
 - `--no-vector-db`: Don't use vector DB
 - `--no-glossary`: Don't use glossary
 - `--glossary-path <path>`: Custom glossary path
@@ -106,6 +107,7 @@ i18n-app-translator review --source ./locales/en.json --dest ./locales/ja.json -
 ```
 
 Options:
+
 - `--no-vector-db`: Don't use vector DB
 - `--no-glossary`: Don't use glossary
 - `--glossary-path <path>`: Custom glossary path
@@ -130,6 +132,7 @@ i18n-app-translator import --source ./glossary.json --type glossary --glossary-p
 ```
 
 Options:
+
 - `--format <format>`: Source file format ("json" or "csv")
 - `--source-language <code>`: Source language code (default: "en")
 - `--config-path <path>`: Custom configuration file path
@@ -143,6 +146,7 @@ i18n-app-translator build-vector --source ./locales/en.json --target ./locales/j
 ```
 
 Options:
+
 - `--batch-size <size>`: Processing batch size (default: 50)
 - `--source-language <code>`: Source language code (default: "en")
 - `--concurrency <number>`: Number of parallel processes (default: 5)
@@ -158,6 +162,7 @@ i18n-app-translator search "wallet top up" --lang ja --limit 5
 ```
 
 Options:
+
 - `--config-path <path>`: Custom configuration file path
 
 ## Error Handling
@@ -171,6 +176,7 @@ This tool implements robust error handling and provides clear error messages in 
 - API connection errors
 
 Error levels are displayed in four stages:
+
 - INFO: Information only
 - WARNING: Warning (processing continues)
 - ERROR: Error (processing stops)
