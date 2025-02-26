@@ -27,7 +27,7 @@ npm install -g i18n-app-translator
 Or clone the repository and run in development mode:
 
 ```bash
-git clone https://github.com/yourusername/i18n-app-translator.git
+git clone https://github.com/tumf/i18n-app-translator.git
 cd i18n-app-translator
 npm install
 npm run dev
@@ -44,19 +44,60 @@ cp .env.example .env
 Required environment variables:
 
 - `OPENAI_API_KEY`: OpenAI API key (required for translation)
-- `VECTOR_DB_URL`: Vector database URL (required for search)
-- `VECTOR_DB_API_KEY`: Vector database API key (optional)
+
+Vector database configuration (choose one):
+
+- For Weaviate:
+  - `WEAVIATE_URL`: Weaviate URL (required for search)
+  - `WEAVIATE_API_KEY`: Weaviate API key (optional)
+
+- For Pinecone:
+  - `PINECONE_API_KEY`: Pinecone API key (required for search)
+  - `PINECONE_ENVIRONMENT`: Pinecone environment (required for search)
+  - `PINECONE_INDEX`: Pinecone index name (optional, default: "translations")
 
 ## Configuration File
 
-Create a `.i18n-app-translatorrc` file to customize default settings.
+You can customize the default settings by creating a `.i18n-app-translatorrc` file.
+
+Example configuration for Weaviate:
 
 ```json
 {
   "vectorDB": {
     "enabled": true,
-    "url": "your-vector-db-url",
-    "apiKey": "your-vector-db-api-key",
+    "url": "your-weaviate-url",
+    "apiKey": "your-weaviate-api-key",
+    "namespace": "translations"
+  },
+  "glossary": {
+    "enabled": true,
+    "path": "./custom-glossary.json"
+  },
+  "translation": {
+    "concurrency": 5,
+    "showProgress": true,
+    "similarTranslationsLimit": 3
+  },
+  "logging": {
+    "level": 1,
+    "logToFile": true,
+    "logFilePath": "./logs/i18n-app-translator.log",
+    "logToConsole": true,
+    "timestamp": true
+  }
+}
+```
+
+Example configuration for Pinecone:
+
+```json
+{
+  "vectorDB": {
+    "enabled": true,
+    "apiKey": "your-pinecone-api-key",
+    "environment": "your-pinecone-environment",
+    "indexName": "your-pinecone-index",
     "namespace": "translations"
   },
   "glossary": {

@@ -27,7 +27,7 @@ npm install -g i18n-app-translator
 または、リポジトリをクローンして開発モードで実行:
 
 ```bash
-git clone https://github.com/yourusername/i18n-app-translator.git
+git clone https://github.com/tumf/i18n-app-translator.git
 cd i18n-app-translator
 npm install
 npm run dev
@@ -44,19 +44,60 @@ cp .env.example .env
 必要な環境変数:
 
 - `OPENAI_API_KEY`: OpenAI APIキー（翻訳機能に必要）
-- `VECTOR_DB_URL`: ベクターデータベースのURL（検索機能に必要）
-- `VECTOR_DB_API_KEY`: ベクターデータベースのAPIキー（オプション）
+
+ベクターデータベース設定（いずれかを選択）:
+
+- Weaviateを使用する場合:
+  - `WEAVIATE_URL`: WeaviateのURL（検索機能に必要）
+  - `WEAVIATE_API_KEY`: WeaviateのAPIキー（オプション）
+
+- Pineconeを使用する場合:
+  - `PINECONE_API_KEY`: PineconeのAPIキー（検索機能に必要）
+  - `PINECONE_ENVIRONMENT`: Pineconeの環境設定（検索機能に必要）
+  - `PINECONE_INDEX`: Pineconeのインデックス名（オプション、デフォルト: "translations"）
 
 ## 設定ファイル
 
 `.i18n-app-translatorrc` ファイルを作成することで、デフォルト設定をカスタマイズできます。
 
+Weaviateを使用する場合の設定例:
+
 ```json
 {
   "vectorDB": {
     "enabled": true,
-    "url": "your-vector-db-url",
-    "apiKey": "your-vector-db-api-key",
+    "url": "your-weaviate-url",
+    "apiKey": "your-weaviate-api-key",
+    "namespace": "translations"
+  },
+  "glossary": {
+    "enabled": true,
+    "path": "./custom-glossary.json"
+  },
+  "translation": {
+    "concurrency": 5,
+    "showProgress": true,
+    "similarTranslationsLimit": 3
+  },
+  "logging": {
+    "level": 1,
+    "logToFile": true,
+    "logFilePath": "./logs/i18n-app-translator.log",
+    "logToConsole": true,
+    "timestamp": true
+  }
+}
+```
+
+Pineconeを使用する場合の設定例:
+
+```json
+{
+  "vectorDB": {
+    "enabled": true,
+    "apiKey": "your-pinecone-api-key",
+    "environment": "your-pinecone-environment",
+    "indexName": "your-pinecone-index",
     "namespace": "translations"
   },
   "glossary": {
