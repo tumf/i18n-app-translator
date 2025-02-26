@@ -7,6 +7,7 @@ import { review } from './commands/review';
 import { importData } from './commands/import';
 import { buildVector } from './commands/build-vector';
 import { search } from './commands/search';
+import { handleError, validateEnvironmentVars } from './utils/errorHandler';
 
 // Load environment variables
 dotenv.config();
@@ -31,15 +32,22 @@ program
   .option('--glossary-path <path>', 'Custom glossary path')
   .option('--context <context>', 'Context for translations (e.g. "button labels")')
   .action((options) => {
-    translate({
-      source: options.source,
-      dest: options.dest,
-      lang: options.lang,
-      useVectorDB: options.vectorDb !== false,
-      useGlossary: options.glossary !== false,
-      glossaryPath: options.glossaryPath,
-      context: options.context,
-    });
+    try {
+      // Validate environment variables if using AI services
+      validateEnvironmentVars(['OPENAI_API_KEY']);
+      
+      translate({
+        source: options.source,
+        dest: options.dest,
+        lang: options.lang,
+        useVectorDB: options.vectorDb !== false,
+        useGlossary: options.glossary !== false,
+        glossaryPath: options.glossaryPath,
+        context: options.context,
+      });
+    } catch (error) {
+      handleError(error);
+    }
   });
 
 // Register review command
@@ -53,18 +61,26 @@ program
   .option('--no-glossary', 'Disable glossary usage')
   .option('--glossary-path <path>', 'Custom glossary path')
   .option('--context <context>', 'Context for translations (e.g. "button labels")')
+  .option('--interactive', 'Enable interactive mode')
   .option('--all', 'Review all translations, not just outdated ones')
   .action((options) => {
-    review({
-      source: options.source,
-      dest: options.dest,
-      lang: options.lang,
-      useVectorDB: options.vectorDb !== false,
-      useGlossary: options.glossary !== false,
-      glossaryPath: options.glossaryPath,
-      context: options.context,
-      all: options.all,
-    });
+    try {
+      // Validate environment variables if using AI services
+      validateEnvironmentVars(['OPENAI_API_KEY']);
+      
+      review({
+        source: options.source,
+        dest: options.dest,
+        lang: options.lang,
+        useVectorDB: options.vectorDb !== false,
+        useGlossary: options.glossary !== false,
+        glossaryPath: options.glossaryPath,
+        context: options.context,
+        all: options.all,
+      });
+    } catch (error) {
+      handleError(error);
+    }
   });
 
 // Register import command
@@ -79,15 +95,19 @@ program
   .option('--glossary-path <path>', 'Custom glossary path')
   .option('--format <format>', 'Format of the source file: "json" or "csv"', 'json')
   .action((options) => {
-    importData({
-      source: options.source,
-      type: options.type,
-      dest: options.dest,
-      sourceLanguage: options.sourceLanguage,
-      targetLanguage: options.targetLanguage,
-      glossaryPath: options.glossaryPath,
-      format: options.format,
-    });
+    try {
+      importData({
+        source: options.source,
+        type: options.type as 'glossary' | 'translations',
+        dest: options.dest,
+        sourceLanguage: options.sourceLanguage,
+        targetLanguage: options.targetLanguage,
+        glossaryPath: options.glossaryPath,
+        format: options.format as 'json' | 'csv',
+      });
+    } catch (error) {
+      handleError(error);
+    }
   });
 
 // Register build-vector command
@@ -97,31 +117,47 @@ program
   .requiredOption('--source <path>', 'Source JSON (e.g. en.json)')
   .requiredOption('--target <path>', 'Target JSON (e.g. ja.json)')
   .requiredOption('--target-language <code>', 'Target language code')
-  .option('--context <context>', 'Context for translations')
+  .option('--source-language <code>', 'Source language code', 'en')
+  .option('--context <path>', 'Source code context directory')
   .option('--batch-size <size>', 'Batch size for processing', '50')
   .action((options) => {
-    buildVector({
-      source: options.source,
-      target: options.target,
-      targetLanguage: options.targetLanguage,
-      context: options.context,
-      batchSize: parseInt(options.batchSize, 10),
-    });
+    try {
+      // Validate environment variables for vector DB
+      validateEnvironmentVars(['OPENAI_API_KEY', 'VECTOR_DB_URL']);
+      
+      buildVector({
+        source: options.source,
+        target: options.target,
+        targetLanguage: options.targetLanguage,
+        sourceLanguage: options.sourceLanguage,
+        context: options.context,
+        batchSize: parseInt(options.batchSize, 10),
+      });
+    } catch (error) {
+      handleError(error);
+    }
   });
 
 // Register search command
 program
   .command('search')
   .description('Search for similar translations in vector database')
-  .requiredOption('--query <text>', 'Text to search for')
+  .argument('<query>', 'Text to search for')
   .requiredOption('--lang <code>', 'Language code to search in')
   .option('--limit <count>', 'Maximum number of results', '5')
-  .action((options) => {
-    search({
-      query: options.query,
-      lang: options.lang,
-      limit: parseInt(options.limit, 10),
-    });
+  .action((query, options) => {
+    try {
+      // Validate environment variables for vector DB
+      validateEnvironmentVars(['VECTOR_DB_URL']);
+      
+      search({
+        query,
+        lang: options.lang,
+        limit: parseInt(options.limit, 10),
+      });
+    } catch (error) {
+      handleError(error);
+    }
   });
 
 // Parse arguments
@@ -131,3 +167,13 @@ program.parse(process.argv);
 if (process.argv.length <= 2) {
   program.help();
 }
+
+// Global error handler for uncaught exceptions
+process.on('uncaughtException', (error) => {
+  handleError(error);
+});
+
+// Global error handler for unhandled promise rejections
+process.on('unhandledRejection', (reason) => {
+  handleError(reason);
+});
