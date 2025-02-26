@@ -1,0 +1,15 @@
+---
+description: running tasks with todo list
+globs:
+alwaysApply: false
+---
+ToDo List: .tmp/todo.md
+
+- ユーザにタスクを頼まれたら ToDo List を更新して
+- やるべきことがあるか ToDo List を確認して
+- やるべきことがなかったら終了
+- ToDo Listの上から未実装のtodoを確認して、実装がされていたらチェックして
+- 実装されていなかったら実装をして
+- 他のタスクに依存しているようだったらスキップして次のタスクに取り掛かって
+- ひとつのタスクの実装が終わったらチェックして
+- 新たな事実がわかったら ToDo List を積極的に更新して
