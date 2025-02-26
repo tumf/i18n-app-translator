@@ -1,0 +1,20 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集"
+  },
+  "auth": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "register": "登録",
+    "forgotPassword": "パスワードをお忘れですか"
+  },
+  "errors": {
+    "required": "このフィールドは必須です。",
+    "invalidEmail": "有効なメールアドレスを入力してください",
+    "passwordMismatch": "パスワードが一致しません"
+  }
+}
