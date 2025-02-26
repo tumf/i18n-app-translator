@@ -1,6 +1,6 @@
 {
   "name": "i18n-app-translator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "AI-powered translation tool for i18n files with vector database support",
   "type": "module",
   "main": "dist/index.js",
