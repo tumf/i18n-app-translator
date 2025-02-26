@@ -28,7 +28,12 @@
     "format:check": "prettier --check 'src/**/*.ts'",
     "spell:check": "cspell 'src/**/*.ts'",
     "prepare": "husky || true",
-    "prepublishOnly": "npm run lint && npm run test"
+    "prepublishOnly": "npm run lint && npm run test",
+    "version": "git add -A",
+    "postversion": "git push && git push --tags",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major"
   },
   "keywords": [
     "i18n",
