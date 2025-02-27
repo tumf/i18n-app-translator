@@ -50,7 +50,7 @@ cp .env.example .env
 
 Required environment variables:
 
-- `OPENAI_API_KEY`: OpenAI API key (required for translation)
+- `OPENAI_API_KEY`: API key for Vercel AI SDK with OpenAI provider (required for translation)
 
 Vector database configuration (choose one):
 

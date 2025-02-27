@@ -84,13 +84,13 @@
     "typescript-eslint": "^8.25.0"
   },
   "dependencies": {
-    "@langchain/openai": "^0.4.4",
+    "@ai-sdk/openai": "1.1.14",
     "@pinecone-database/pinecone": "^5.0.2",
+    "ai": "4.1.46",
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
     "glob": "^11.0.1",
     "langchain": "^0.3.19",
-    "openai": "^4.85.4",
     "pinecone-client": "^2.0.0",
     "weaviate-ts-client": "^2.2.0"
   },

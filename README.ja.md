@@ -50,7 +50,7 @@ cp .env.example .env
 
 必要な環境変数:
 
-- `OPENAI_API_KEY`: OpenAI APIキー（翻訳機能に必要）
+- `OPENAI_API_KEY`: Vercel AI SDK with OpenAI providerのAPIキー（翻訳機能に必要）
 
 ベクターデータベース設定（いずれかを選択）:
 
