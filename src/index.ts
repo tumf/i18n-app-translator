@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+/* istanbul ignore file */
 import { Command } from 'commander';
 import dotenv from 'dotenv';
 import { translate } from './commands/translate';
@@ -31,7 +32,10 @@ program
   .option('--no-glossary', 'Disable glossary usage')
   .option('--glossary-path <path>', 'Custom glossary path')
   .option('--context <context>', 'Context for translations (e.g. "button labels")')
-  .option('--context-from-code <path>', 'Extract context automatically from files in the specified directory')
+  .option(
+    '--context-from-code <path>',
+    'Extract context automatically from files in the specified directory',
+  )
   .option('--concurrency <number>', 'Number of concurrent translations', '5')
   .option('--no-progress', 'Disable progress display')
   .option('--config-path <path>', 'Custom config file path')

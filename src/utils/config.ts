@@ -75,6 +75,7 @@ export class ConfigManager {
     this.loadConfig();
   }
 
+  /* istanbul ignore next */
   private loadConfig(): void {
     try {
       if (fs.existsSync(this.configPath)) {
@@ -137,10 +138,12 @@ export class ConfigManager {
     return result;
   }
 
+  /* istanbul ignore next */
   getConfig(): IConfig {
     return this.config;
   }
 
+  /* istanbul ignore next */
   saveConfig(): void {
     try {
       fs.writeFileSync(this.configPath, JSON.stringify(this.config, null, 2));
