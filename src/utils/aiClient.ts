@@ -1,12 +1,40 @@
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import dotenv from 'dotenv';
+import { AppError, ErrorLevel } from './errorHandler';
 
 // Load environment variables directly in this module
 dotenv.config();
 
 // Check if mock mode is enabled
 const MOCK_MODE = process.env.MOCK_MODE === 'true';
+
+// Default LLM model
+const DEFAULT_LLM = 'gpt-4o';
+
+/**
+ * Get the LLM model based on the TRANSLATION_LLM environment variable or configuration
+ * @returns The LLM model to use for translation
+ * @throws {AppError} If the LLM provider is invalid
+ */
+// Import ConfigManager
+import configManager from './config';
+
+export function getLLMModel() {
+  // Check for environment variable first, then config, then default
+  const config = configManager.getConfig();
+  const llmProvider = process.env.TRANSLATION_LLM || config.translation?.llmProvider || DEFAULT_LLM;
+
+  try {
+    return openai(llmProvider);
+  } catch {
+    throw new AppError(`Invalid LLM provider: ${llmProvider}. Please use a valid OpenAI model.`, {
+      level: ErrorLevel.ERROR,
+      exit: true,
+      details: `The TRANSLATION_LLM environment variable must be set to a valid OpenAI model (e.g., ${DEFAULT_LLM}).`,
+    });
+  }
+}
 
 /**
  * Generate translation using Vercel AI SDK
@@ -67,7 +95,7 @@ export async function generateTranslation(
   // Call Vercel AI SDK
   /* istanbul ignore next */
   const response = await generateText({
-    model: openai('gpt-4o'),
+    model: getLLMModel(),
     messages: [
       {
         role: 'system',
@@ -134,7 +162,7 @@ export async function reviewTranslation(
   // Call Vercel AI SDK
   /* istanbul ignore next */
   const response = await generateText({
-    model: openai('gpt-4o'),
+    model: getLLMModel(),
     messages: [
       {
         role: 'system',
