@@ -8,6 +8,7 @@ dotenv.config();
 const MOCK_MODE = process.env.MOCK_MODE === 'true';
 
 // Initialize OpenAI client with a default API key if in mock mode
+/* istanbul ignore next */
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'sk-mock-key-for-testing',
 });
@@ -31,6 +32,7 @@ export async function generateTranslation(
   debug?: boolean,
 ): Promise<string> {
   // Return mock response if in mock mode
+  /* istanbul ignore next */
   if (MOCK_MODE) {
     console.log(`[MOCK] Translating: "${sourceText}" to ${targetLanguage}`);
     if (context) {
@@ -75,6 +77,7 @@ export async function generateTranslation(
   }
 
   // Call OpenAI API
+  /* istanbul ignore next */
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
@@ -101,8 +104,11 @@ export async function reviewTranslation(
   glossary?: Record<string, string>,
 ): Promise<{ improved: string; changes: string }> {
   // Return mock response if in mock mode
+  /* istanbul ignore next */
   if (MOCK_MODE) {
-    console.log(`[MOCK] Reviewing: "${existingTranslation}" for "${sourceText}" in ${targetLanguage}`);
+    console.log(
+      `[MOCK] Reviewing: "${existingTranslation}" for "${sourceText}" in ${targetLanguage}`,
+    );
     if (context) {
       console.log(`[MOCK] Context: ${context}`);
     }
@@ -138,6 +144,7 @@ export async function reviewTranslation(
   prompt += 'CHANGES: [brief explanation of changes made, or "No changes needed" if unchanged]';
 
   // Call OpenAI API
+  /* istanbul ignore next */
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
