@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { buildVector } from '../commands/build-vector';
 import { Parser } from '../utils/parser';
 import { createVectorDBClient } from '../utils/vectorDBClient';
