@@ -6,7 +6,7 @@ import { jest } from '@jest/globals';
 // Mock modules - use auto mocking
 jest.mock('path');
 jest.mock('glob', () => ({
-  glob: jest.fn().mockResolvedValue(['file1.ts', 'file2.ts']),
+  glob: jest.fn().mockImplementation(() => Promise.resolve(['file1.ts', 'file2.ts'])),
 }));
 jest.mock('util', () => ({
   promisify: jest.fn().mockImplementation(() => {
