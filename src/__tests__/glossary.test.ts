@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import type { IGlossaryEntry } from '../utils/glossary';
 import { Glossary } from '../utils/glossary';
 import { jest } from '@jest/globals';
