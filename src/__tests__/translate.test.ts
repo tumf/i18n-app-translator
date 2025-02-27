@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { translate } from '../commands/translate';
 import { Parser } from '../utils/parser';
 import { Translator } from '../utils/translator';
@@ -27,13 +27,13 @@ jest.mock('openai', () => {
   return {
     OpenAI: jest.fn().mockImplementation(() => ({
       embeddings: {
-        create: jest.fn().mockResolvedValue({
+        create: jest.fn<any>().mockResolvedValue({
           data: [{ embedding: [0.1, 0.2, 0.3] }],
         }),
       },
       chat: {
         completions: {
-          create: jest.fn().mockResolvedValue({
+          create: jest.fn<any>().mockResolvedValue({
             choices: [{ message: { content: '{"translated": "翻訳されたテキスト"}' } }],
           }),
         },
@@ -90,7 +90,7 @@ describe('translate command', () => {
 
     // Setup ContextExtractor mock
     (ContextExtractor as jest.Mock).mockImplementation(() => ({
-      extractContextForKeys: mockExtractContextForKeys.mockResolvedValue(new Map()),
+      extractContextForKeys: mockExtractContextForKeys.mockReturnValue(Promise.resolve(new Map())),
       formatContextString: mockFormatContextString.mockReturnValue('Mocked context from code'),
     }));
 
@@ -122,7 +122,7 @@ describe('translate command', () => {
       return Promise.resolve([]);
     });
 
-    mockBatchTranslate.mockResolvedValue(translationResults as any);
+    mockBatchTranslate.mockReturnValue(Promise.resolve(translationResults as any));
     mockGetAllEntries.mockReturnValue([]);
     mockBuildI18nData.mockReturnValue({ mock: 'data' });
 
@@ -174,8 +174,8 @@ describe('translate command', () => {
 
     // Setup mock return values
     (fs.existsSync as jest.Mock).mockReturnValue(false);
-    mockParseI18nFile.mockResolvedValueOnce(sourceEntries as any);
-    mockBatchTranslate.mockResolvedValue(translationResults as any);
+    mockParseI18nFile.mockReturnValueOnce(Promise.resolve(sourceEntries as any));
+    mockBatchTranslate.mockReturnValue(Promise.resolve(translationResults as any));
     mockBuildI18nData.mockReturnValue({ mock: 'data' });
 
     // Call the translate function
@@ -254,7 +254,7 @@ describe('translate command', () => {
       return Promise.resolve([]);
     });
 
-    mockBatchTranslate.mockResolvedValue(translationResults as any);
+    mockBatchTranslate.mockReturnValue(Promise.resolve(translationResults as any));
     mockGetAllEntries.mockReturnValue([]);
     mockBuildI18nData.mockReturnValue({ mock: 'data' });
 
