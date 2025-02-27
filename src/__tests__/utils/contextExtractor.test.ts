@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import type { IContextExtractorOptions } from '../../utils/contextExtractor';
 import { ContextExtractor } from '../../utils/contextExtractor';
 import logger from '../../utils/logger';
@@ -31,7 +31,13 @@ jest
         options = undefined;
       }
       if (callback) {
-        callback(null, Buffer.from('mocked file content'));
+        if (String(path).includes('file1.ts')) {
+          callback(null, Buffer.from('line1\nkey1\nline3\nline4\nkey2\nline6'));
+        } else if (String(path).includes('file2.ts')) {
+          callback(null, Buffer.from('line1\nline2\nkey1 in some context\nline4'));
+        } else {
+          callback(null, Buffer.from('mocked file content'));
+        }
       }
       return undefined as any;
     },

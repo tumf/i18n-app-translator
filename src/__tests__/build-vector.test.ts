@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { buildVector } from '../commands/build-vector';
 import { Parser } from '../utils/parser';
 import { createVectorDBClient } from '../utils/vectorDBClient';
@@ -28,7 +28,7 @@ jest.mock('openai', () => {
         create: jest.fn().mockImplementation(() =>
           Promise.resolve({
             data: [{ embedding: [0.1, 0.2, 0.3] }],
-          }),
+          } as any),
         ),
       },
     })),
