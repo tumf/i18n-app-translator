@@ -21,9 +21,7 @@ jest.mock('openai', () => {
   return {
     OpenAI: jest.fn().mockImplementation(() => ({
       embeddings: {
-        create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }],
-        }),
+        create: jest.fn(),
       },
     })),
   };
@@ -32,10 +30,7 @@ jest.mock('openai', () => {
 describe('search command', () => {
   // Setup mocks
   const mockInitialize = jest.fn();
-  const mockFindSimilarTranslations = jest.fn<
-    Promise<Array<{ source: string; translation: string; similarity: number }>>,
-    [string, string, number?]
-  >();
+  const mockFindSimilarTranslations = jest.fn();
   const mockClose = jest.fn();
 
   beforeEach(() => {
@@ -73,7 +68,7 @@ describe('search command', () => {
     ];
 
     // Setup mock return values
-    mockFindSimilarTranslations.mockResolvedValue(searchResults);
+    mockFindSimilarTranslations.mockReturnValue(Promise.resolve(searchResults));
 
     // Call the search function
     await search({
@@ -94,7 +89,7 @@ describe('search command', () => {
 
   test('should handle empty search results', async () => {
     // Setup mock to return empty results
-    mockFindSimilarTranslations.mockResolvedValue([]);
+    mockFindSimilarTranslations.mockReturnValue(Promise.resolve([]));
 
     // Call the search function
     await search({

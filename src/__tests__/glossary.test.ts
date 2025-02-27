@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import type { IGlossaryEntry } from '../utils/glossary';
 import { Glossary } from '../utils/glossary';
 import { jest } from '@jest/globals';
@@ -13,6 +13,7 @@ jest.mock('fs', () => ({
     mkdir: jest.fn(),
   },
 }));
+
 jest.mock('path');
 
 describe('Glossary', () => {
@@ -53,7 +54,7 @@ describe('Glossary', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(true);
 
       // Mock fs.promises.readFile to return sample entries
-      (fs.promises.readFile as jest.Mock).mockResolvedValue(JSON.stringify(sampleEntries));
+      (fs.promises.readFile as jest.Mock<any>).mockResolvedValue(JSON.stringify(sampleEntries));
 
       // Call the load method
       await glossary.load();
@@ -71,7 +72,7 @@ describe('Glossary', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(false);
 
       // Mock fs.promises.writeFile to do nothing
-      (fs.promises.writeFile as jest.Mock).mockResolvedValue(undefined);
+      (fs.promises.writeFile as jest.Mock<any>).mockResolvedValue(undefined);
 
       // Call the load method
       await glossary.load();
@@ -93,7 +94,7 @@ describe('Glossary', () => {
 
       // Mock fs.promises.readFile to throw an error
       const testError = new Error('Test error');
-      (fs.promises.readFile as jest.Mock).mockRejectedValue(testError);
+      (fs.promises.readFile as jest.Mock<any>).mockRejectedValue(testError);
 
       // Call the load method and expect it to throw
       await expect(glossary.load()).rejects.toThrow(testError);
@@ -112,7 +113,7 @@ describe('Glossary', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(true);
 
       // Mock fs.promises.writeFile to do nothing
-      (fs.promises.writeFile as jest.Mock).mockResolvedValue(undefined);
+      (fs.promises.writeFile as jest.Mock<any>).mockResolvedValue(undefined);
 
       // Call the save method
       await glossary.save();
@@ -131,10 +132,10 @@ describe('Glossary', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(false);
 
       // Mock fs.promises.mkdir to do nothing
-      (fs.promises.mkdir as jest.Mock).mockResolvedValue(undefined);
+      (fs.promises.mkdir as jest.Mock<any>).mockResolvedValue(undefined);
 
       // Mock fs.promises.writeFile to do nothing
-      (fs.promises.writeFile as jest.Mock).mockResolvedValue(undefined);
+      (fs.promises.writeFile as jest.Mock<any>).mockResolvedValue(undefined);
 
       // Call the save method
       await glossary.save();
@@ -155,7 +156,7 @@ describe('Glossary', () => {
 
       // Mock fs.promises.writeFile to throw an error
       const testError = new Error('Test error');
-      (fs.promises.writeFile as jest.Mock).mockRejectedValue(testError);
+      (fs.promises.writeFile as jest.Mock<any>).mockRejectedValue(testError);
 
       // Call the save method and expect it to throw
       await expect(glossary.save()).rejects.toThrow(testError);

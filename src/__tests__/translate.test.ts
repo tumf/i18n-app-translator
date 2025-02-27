@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { translate } from '../commands/translate';
 import { Parser } from '../utils/parser';
 import { Translator } from '../utils/translator';
@@ -27,7 +27,7 @@ jest.mock('openai', () => {
   return {
     OpenAI: jest.fn().mockImplementation(() => ({
       embeddings: {
-        create: jest.fn().mockImplementation(() =>
+        create: jest.fn<any>().mockImplementation(() =>
           Promise.resolve({
             data: [{ embedding: [0.1, 0.2, 0.3] }],
           }),
@@ -35,7 +35,7 @@ jest.mock('openai', () => {
       },
       chat: {
         completions: {
-          create: jest.fn().mockImplementation(() =>
+          create: jest.fn<any>().mockImplementation(() =>
             Promise.resolve({
               choices: [{ message: { content: '{"translated": "翻訳されたテキスト"}' } }],
             }),
