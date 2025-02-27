@@ -2,6 +2,31 @@ import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Create a chalk alternative implementation
+const createColorizer = () => {
+  // Fallback in case chalk v5 (ESM) cannot be loaded
+  const fallback = {
+    blue: (text: string) => `[INFO] ${text}`,
+    yellow: (text: string) => `[WARN] ${text}`,
+    red: (text: string) => `[ERROR] ${text}`,
+    gray: (text: string) => text,
+    bgRed: {
+      white: (text: string) => `[FATAL] ${text}`,
+    },
+  };
+
+  // Try to use the actual chalk
+  try {
+    return chalk;
+  } catch {
+    console.warn('Using fallback colorizer instead of chalk');
+    return fallback;
+  }
+};
+
+// Get a colorizer that works in both environments
+const colorizer = createColorizer();
+
 export enum ErrorLevel {
   INFO = 'info',
   WARNING = 'warning',
@@ -36,22 +61,22 @@ export function handleError(error: unknown): void {
   if (error instanceof AppError) {
     switch (error.level) {
       case ErrorLevel.INFO:
-        console.log(chalk.blue(`ℹ️ ${error.message}`));
+        console.log(colorizer.blue(`ℹ️ ${error.message}`));
         break;
       case ErrorLevel.WARNING:
-        console.warn(chalk.yellow(`⚠️ ${error.message}`));
+        console.warn(colorizer.yellow(`⚠️ ${error.message}`));
         break;
       case ErrorLevel.ERROR:
-        console.error(chalk.red(`❌ ${error.message}`));
+        console.error(colorizer.red(`❌ ${error.message}`));
         break;
       case ErrorLevel.FATAL:
-        console.error(chalk.bgRed.white(`💥 FATAL: ${error.message}`));
+        console.error(colorizer.bgRed.white(`💥 FATAL: ${error.message}`));
         break;
     }
 
     if (error.details) {
-      console.log(chalk.gray('Details:'));
-      console.log(chalk.gray(JSON.stringify(error.details, null, 2)));
+      console.log(colorizer.gray('Details:'));
+      console.log(colorizer.gray(JSON.stringify(error.details, null, 2)));
     }
 
     /* istanbul ignore next */
@@ -59,13 +84,13 @@ export function handleError(error: unknown): void {
       process.exit(error.code);
     }
   } else if (error instanceof Error) {
-    console.error(chalk.red(`❌ Unexpected error: ${error.message}`));
-    console.error(chalk.gray(error.stack || ''));
+    console.error(colorizer.red(`❌ Unexpected error: ${error.message}`));
+    console.error(colorizer.gray(error.stack || ''));
     /* istanbul ignore next */
     process.exit(1);
   } else {
-    console.error(chalk.red('❌ Unknown error occurred'));
-    console.error(chalk.gray(String(error)));
+    console.error(colorizer.red('❌ Unknown error occurred'));
+    console.error(colorizer.gray(String(error)));
     /* istanbul ignore next */
     process.exit(1);
   }

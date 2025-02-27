@@ -1,7 +1,19 @@
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import dotenv from 'dotenv';
-import { AppError, ErrorLevel } from './errorHandler';
+
+// Inline error class definition - to avoid circular dependencies
+class AIClientError extends Error {
+  exit: boolean;
+  code: number;
+
+  constructor(message: string, exit = false, code = 1) {
+    super(message);
+    this.name = 'AIClientError';
+    this.exit = exit;
+    this.code = code;
+  }
+}
 
 // Load environment variables directly in this module
 dotenv.config();
@@ -9,8 +21,9 @@ dotenv.config();
 // Check if mock mode is enabled
 const MOCK_MODE = process.env.MOCK_MODE === 'true';
 
-// Default LLM model
+// Default LLM models
 const DEFAULT_LLM = 'gpt-4o';
+const DEFAULT_EMBEDDING_LLM = 'text-embedding-3-small';
 
 /**
  * Get the LLM model based on the TRANSLATION_LLM environment variable or configuration
@@ -28,11 +41,33 @@ export function getLLMModel() {
   try {
     return openai(llmProvider);
   } catch {
-    throw new AppError(`Invalid LLM provider: ${llmProvider}. Please use a valid OpenAI model.`, {
-      level: ErrorLevel.ERROR,
-      exit: true,
-      details: `The TRANSLATION_LLM environment variable must be set to a valid OpenAI model (e.g., ${DEFAULT_LLM}).`,
-    });
+    throw new AIClientError(
+      `Invalid LLM provider: ${llmProvider}. Please use a valid OpenAI model.`,
+      true,
+      1,
+    );
+  }
+}
+
+/**
+ * Get the embedding model based on the EMBEDDING_LLM environment variable or configuration
+ * @returns The embedding model to use for vector embeddings
+ * @throws {AppError} If the embedding provider is invalid
+ */
+export function getEmbeddingModel() {
+  // Check for environment variable first, then config, then default
+  const config = configManager.getConfig();
+  const embeddingProvider =
+    process.env.EMBEDDING_LLM || config.translation?.embeddingProvider || DEFAULT_EMBEDDING_LLM;
+
+  try {
+    return openai.embedding(embeddingProvider);
+  } catch {
+    throw new AIClientError(
+      `Invalid embedding provider: ${embeddingProvider}. Please use a valid OpenAI embedding model.`,
+      true,
+      1,
+    );
   }
 }
 

@@ -20,6 +20,7 @@ export interface ITranslationConfig {
   similarTranslationsLimit: number;
   debug?: boolean;
   llmProvider?: string;
+  embeddingProvider?: string;
 }
 
 export interface ILoggingConfig {
@@ -58,6 +59,7 @@ export const DEFAULT_CONFIG: IConfig = {
     similarTranslationsLimit: 3,
     debug: false,
     llmProvider: 'gpt-4o',
+    embeddingProvider: 'text-embedding-3-small',
   },
   logging: {
     level: LogLevel.INFO,
