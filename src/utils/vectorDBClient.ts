@@ -4,9 +4,11 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 
+/* istanbul ignore next - environment-dependent code */
 // Load environment variables directly in this module
 dotenv.config();
 
+/* istanbul ignore next - environment-dependent code */
 // Initialize OpenAI client for embeddings
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -56,7 +58,7 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
         .classCreator()
         .withClass({
           class: this.className,
-          vectorizer: 'text2vec-openai',
+          vectorizer: 'text2vec-openai', // cspell:ignore vectorizer
           properties: [
             {
               name: 'sourceText',
@@ -115,6 +117,7 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
       throw new Error('Client not initialized');
     }
 
+    /* istanbul ignore next - external API call */
     // Generate embedding using OpenAI
     const embeddingResponse = await openai.embeddings.create({
       model: 'text-embedding-3-small',
@@ -196,6 +199,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
       throw new Error('Index not initialized');
     }
 
+    /* istanbul ignore next - external API call */
     // Generate embedding using OpenAI
     const embeddingResponse = await openai.embeddings.create({
       model: 'text-embedding-3-small',
@@ -230,6 +234,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
       throw new Error('Index not initialized');
     }
 
+    /* istanbul ignore next - external API call */
     // Generate embedding using OpenAI
     const embeddingResponse = await openai.embeddings.create({
       model: 'text-embedding-3-small',
