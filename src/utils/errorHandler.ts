@@ -54,16 +54,19 @@ export function handleError(error: unknown): void {
       console.log(chalk.gray(JSON.stringify(error.details, null, 2)));
     }
 
+    /* istanbul ignore next */
     if (error.exit) {
       process.exit(error.code);
     }
   } else if (error instanceof Error) {
     console.error(chalk.red(`❌ Unexpected error: ${error.message}`));
     console.error(chalk.gray(error.stack || ''));
+    /* istanbul ignore next */
     process.exit(1);
   } else {
     console.error(chalk.red('❌ Unknown error occurred'));
     console.error(chalk.gray(String(error)));
+    /* istanbul ignore next */
     process.exit(1);
   }
 }

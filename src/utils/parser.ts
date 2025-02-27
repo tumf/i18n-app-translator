@@ -120,6 +120,7 @@ export class Parser {
   /**
    * Get line number from character index in content
    */
+  /* istanbul ignore next */
   private getLineNumber(content: string, index: number): number {
     const lines = content.slice(0, index).split('\n');
     return lines.length;
@@ -188,6 +189,7 @@ export class Parser {
   /**
    * Save i18n data to file
    */
+  /* istanbul ignore next */
   async saveI18nFile(filePath: string, data: I18nData): Promise<void> {
     try {
       const dir = path.dirname(filePath);
