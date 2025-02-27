@@ -2,8 +2,8 @@ import type { WeaviateClient } from 'weaviate-ts-client';
 import weaviate from 'weaviate-ts-client';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { embed } from 'ai';
-import { openai } from '@ai-sdk/openai';
 import dotenv from 'dotenv';
+import { getEmbeddingModel } from './aiClient';
 
 /* istanbul ignore next - environment-dependent code */
 // Load environment variables directly in this module
@@ -121,7 +121,7 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
     // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
     const embeddingResponse = await embed({
-      model: openai.embedding('text-embedding-3-small'), // Embedding model is not affected by TRANSLATION_LLM
+      model: getEmbeddingModel(), // Uses EMBEDDING_LLM environment variable or config
       value: sourceText,
     });
 
@@ -206,7 +206,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
     // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
     const embeddingResponse = await embed({
-      model: openai.embedding('text-embedding-3-small'), // Embedding model is not affected by TRANSLATION_LLM
+      model: getEmbeddingModel(), // Uses EMBEDDING_LLM environment variable or config
       value: sourceText,
     });
 
@@ -242,7 +242,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
     // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
     const embeddingResponse = await embed({
-      model: openai.embedding('text-embedding-3-small'), // Embedding model is not affected by TRANSLATION_LLM
+      model: getEmbeddingModel(), // Uses EMBEDDING_LLM environment variable or config
       value: sourceText,
     });
 
