@@ -25,9 +25,11 @@ jest.mock('openai', () => {
   return {
     OpenAI: jest.fn().mockImplementation(() => ({
       embeddings: {
-        create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }],
-        }),
+        create: jest.fn().mockImplementation(() =>
+          Promise.resolve({
+            data: [{ embedding: [0.1, 0.2, 0.3] }],
+          }),
+        ),
       },
     })),
   };
