@@ -19,6 +19,7 @@ export interface ITranslationConfig {
   showProgress: boolean;
   similarTranslationsLimit: number;
   debug?: boolean;
+  llmProvider?: string;
 }
 
 export interface ILoggingConfig {
@@ -56,6 +57,7 @@ export const DEFAULT_CONFIG: IConfig = {
     showProgress: true,
     similarTranslationsLimit: 3,
     debug: false,
+    llmProvider: 'gpt-4o',
   },
   logging: {
     level: LogLevel.INFO,

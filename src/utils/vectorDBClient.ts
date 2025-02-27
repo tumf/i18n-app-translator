@@ -121,7 +121,7 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
     // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
     const embeddingResponse = await embed({
-      model: openai.embedding('text-embedding-3-small'),
+      model: openai.embedding('text-embedding-3-small'), // Embedding model is not affected by TRANSLATION_LLM
       value: sourceText,
     });
 
@@ -206,7 +206,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
     // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
     const embeddingResponse = await embed({
-      model: openai.embedding('text-embedding-3-small'),
+      model: openai.embedding('text-embedding-3-small'), // Embedding model is not affected by TRANSLATION_LLM
       value: sourceText,
     });
 
@@ -242,7 +242,7 @@ export class PineconeVectorDBClient implements IVectorDBClient {
     // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
     const embeddingResponse = await embed({
-      model: openai.embedding('text-embedding-3-small'),
+      model: openai.embedding('text-embedding-3-small'), // Embedding model is not affected by TRANSLATION_LLM
       value: sourceText,
     });
 
