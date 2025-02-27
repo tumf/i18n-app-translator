@@ -1,0 +1,6 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": ["translatorrc", "vectorizer", "langchain"],
+  "ignorePaths": ["node_modules/**", "dist/**", "coverage/**"]
+}
