@@ -1,4 +1,5 @@
-import { OpenAI } from 'openai';
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
 import dotenv from 'dotenv';
 
 // Load environment variables directly in this module
@@ -7,21 +8,8 @@ dotenv.config();
 // Check if mock mode is enabled
 const MOCK_MODE = process.env.MOCK_MODE === 'true';
 
-// Initialize OpenAI client with a default API key if in mock mode
-/* istanbul ignore next */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-mock-key-for-testing',
-});
-
-// LangChain OpenAI client can be initialized when needed
-// const langchainOpenAI = new ChatOpenAI({
-//   openAIApiKey: process.env.OPENAI_API_KEY,
-//   modelName: 'gpt-4o',
-//   temperature: 0.2,
-// });
-
 /**
- * Generate translation using OpenAI API
+ * Generate translation using Vercel AI SDK
  */
 export async function generateTranslation(
   sourceText: string,
@@ -76,10 +64,10 @@ export async function generateTranslation(
     console.log('=========================');
   }
 
-  // Call OpenAI API
+  // Call Vercel AI SDK
   /* istanbul ignore next */
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+  const response = await generateText({
+    model: openai('gpt-4o'),
     messages: [
       {
         role: 'system',
@@ -90,7 +78,7 @@ export async function generateTranslation(
     temperature: 0.2,
   });
 
-  return response.choices[0].message.content?.trim() || '';
+  return response.text.trim() || '';
 }
 
 /**
@@ -143,10 +131,10 @@ export async function reviewTranslation(
   prompt += 'IMPROVED: [your improved translation]\n';
   prompt += 'CHANGES: [brief explanation of changes made, or "No changes needed" if unchanged]';
 
-  // Call OpenAI API
+  // Call Vercel AI SDK
   /* istanbul ignore next */
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+  const response = await generateText({
+    model: openai('gpt-4o'),
     messages: [
       {
         role: 'system',
@@ -157,7 +145,7 @@ export async function reviewTranslation(
     temperature: 0.2,
   });
 
-  const content = response.choices[0].message.content?.trim() || '';
+  const content = response.text.trim() || '';
 
   // Parse response
   const improvedMatch = content.match(/IMPROVED: (.*?)(?=\nCHANGES:|$)/s);

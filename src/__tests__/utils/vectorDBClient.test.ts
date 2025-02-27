@@ -11,18 +11,18 @@ jest.mock('weaviate-ts-client', () => {
   const mockClient = {
     schema: {
       getter: jest.fn().mockReturnValue({
-        do: jest.fn().mockResolvedValue({ classes: [] } as any),
+        do: jest.fn().mockImplementation(() => Promise.resolve({ classes: [] })),
       }),
       classCreator: jest.fn().mockReturnValue({
         withClass: jest.fn().mockReturnThis(),
-        do: jest.fn().mockResolvedValue({} as any),
+        do: jest.fn().mockImplementation(() => Promise.resolve({})),
       }),
     },
     data: {
       creator: jest.fn().mockReturnValue({
         withClassName: jest.fn().mockReturnThis(),
         withProperties: jest.fn().mockReturnThis(),
-        do: jest.fn().mockResolvedValue({} as any),
+        do: jest.fn().mockImplementation(() => Promise.resolve({})),
       }),
     },
     graphql: {
@@ -32,19 +32,21 @@ jest.mock('weaviate-ts-client', () => {
         withNearVector: jest.fn().mockReturnThis(),
         withWhere: jest.fn().mockReturnThis(),
         withLimit: jest.fn().mockReturnThis(),
-        do: jest.fn().mockResolvedValue({
-          data: {
-            Get: {
-              Translation: [
-                {
-                  sourceText: 'Hello',
-                  translation: 'こんにちは',
-                  _additional: { certainty: 0.95 },
-                },
-              ],
+        do: jest.fn().mockImplementation(() =>
+          Promise.resolve({
+            data: {
+              Get: {
+                Translation: [
+                  {
+                    sourceText: 'Hello',
+                    translation: 'こんにちは',
+                    _additional: { certainty: 0.95 },
+                  },
+                ],
+              },
             },
-          },
-        } as any),
+          }),
+        ),
       }),
     },
   };
@@ -57,19 +59,21 @@ jest.mock('weaviate-ts-client', () => {
 
 jest.mock('@pinecone-database/pinecone', () => {
   const mockIndex = {
-    describeIndexStats: jest.fn().mockResolvedValue({} as any),
-    upsert: jest.fn().mockResolvedValue({} as any),
-    query: jest.fn().mockResolvedValue({
-      matches: [
-        {
-          metadata: {
-            sourceText: 'Hello',
-            translation: 'こんにちは',
+    describeIndexStats: jest.fn().mockImplementation(() => Promise.resolve({})),
+    upsert: jest.fn().mockImplementation(() => Promise.resolve({})),
+    query: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        matches: [
+          {
+            metadata: {
+              sourceText: 'Hello',
+              translation: 'こんにちは',
+            },
+            score: 0.95,
           },
-          score: 0.95,
-        },
-      ],
-    } as any),
+        ],
+      }),
+    ),
   };
 
   return {
@@ -79,16 +83,23 @@ jest.mock('@pinecone-database/pinecone', () => {
   };
 });
 
-// Mock OpenAI
-jest.mock('openai', () => {
+// Mock Vercel AI SDK
+jest.mock('ai', () => {
   return {
-    OpenAI: jest.fn().mockImplementation(() => ({
-      embeddings: {
-        create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }],
-        } as any),
-      },
-    })),
+    embed: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        embedding: [0.1, 0.2, 0.3],
+      }),
+    ),
+  };
+});
+
+// Mock OpenAI provider from Vercel AI SDK
+jest.mock('@ai-sdk/openai', () => {
+  return {
+    openai: {
+      embedding: jest.fn().mockReturnValue('mocked-embedding-model'),
+    },
   };
 });
 

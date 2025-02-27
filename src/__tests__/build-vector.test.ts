@@ -20,16 +20,23 @@ jest.mock('../utils/aiClient', () => ({
   }),
 }));
 
-// Mock OpenAI
-jest.mock('openai', () => {
+// Mock Vercel AI SDK
+jest.mock('ai', () => {
   return {
-    OpenAI: jest.fn().mockImplementation(() => ({
-      embeddings: {
-        create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }],
-        } as any),
-      },
-    })),
+    embed: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        embedding: [0.1, 0.2, 0.3],
+      }),
+    ),
+  };
+});
+
+// Mock OpenAI provider from Vercel AI SDK
+jest.mock('@ai-sdk/openai', () => {
+  return {
+    openai: {
+      embedding: jest.fn().mockReturnValue('mocked-embedding-model'),
+    },
   };
 });
 

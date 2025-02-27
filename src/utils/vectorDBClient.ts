@@ -1,19 +1,13 @@
 import type { WeaviateClient } from 'weaviate-ts-client';
 import weaviate from 'weaviate-ts-client';
 import { Pinecone } from '@pinecone-database/pinecone';
-import { OpenAI } from 'openai';
+import { embed } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import dotenv from 'dotenv';
 
 /* istanbul ignore next - environment-dependent code */
 // Load environment variables directly in this module
 dotenv.config();
-
-/* istanbul ignore next - environment-dependent code */
-// Initialize OpenAI client for embeddings
-/* istanbul ignore next */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 // Vector DB client interface
 export interface IVectorDBClient {
@@ -98,6 +92,10 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
       throw new Error('Client not initialized');
     }
 
+    /* istanbul ignore next - external API call */
+    // No need to generate embedding for Weaviate as it handles this internally
+    /* istanbul ignore next */
+
     await this.client.data
       .creator()
       .withClassName(this.className)
@@ -120,14 +118,14 @@ export class WeaviateVectorDBClient implements IVectorDBClient {
     }
 
     /* istanbul ignore next - external API call */
-    // Generate embedding using OpenAI
+    // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
-    const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: sourceText,
+    const embeddingResponse = await embed({
+      model: openai.embedding('text-embedding-3-small'),
+      value: sourceText,
     });
 
-    const embedding = embeddingResponse.data[0].embedding;
+    const embedding = embeddingResponse.embedding;
 
     const result = await this.client.graphql
       .get()
@@ -205,14 +203,14 @@ export class PineconeVectorDBClient implements IVectorDBClient {
     }
 
     /* istanbul ignore next - external API call */
-    // Generate embedding using OpenAI
+    // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
-    const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: sourceText,
+    const embeddingResponse = await embed({
+      model: openai.embedding('text-embedding-3-small'),
+      value: sourceText,
     });
 
-    const embedding = embeddingResponse.data[0].embedding;
+    const embedding = embeddingResponse.embedding;
 
     // Create a unique ID
     const id = `${language}_${Buffer.from(sourceText).toString('base64')}`;
@@ -241,14 +239,14 @@ export class PineconeVectorDBClient implements IVectorDBClient {
     }
 
     /* istanbul ignore next - external API call */
-    // Generate embedding using OpenAI
+    // Generate embedding using Vercel AI SDK
     /* istanbul ignore next */
-    const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: sourceText,
+    const embeddingResponse = await embed({
+      model: openai.embedding('text-embedding-3-small'),
+      value: sourceText,
     });
 
-    const embedding = embeddingResponse.data[0].embedding;
+    const embedding = embeddingResponse.embedding;
 
     const queryResult = await this.index.query({
       vector: embedding,

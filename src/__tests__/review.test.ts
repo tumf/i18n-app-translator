@@ -21,30 +21,28 @@ jest.spyOn(process, 'exit').mockImplementation((code?: number | string | null | 
   throw new Error(`Process.exit called with code ${code}`);
 });
 
-// Mock OpenAI
-jest.mock('openai', () => {
+// Mock Vercel AI SDK
+jest.mock('ai', () => {
   return {
-    OpenAI: jest.fn().mockImplementation(() => ({
-      embeddings: {
-        create: jest.fn().mockResolvedValue({
-          data: [{ embedding: [0.1, 0.2, 0.3] }],
-        }),
-      },
-      chat: {
-        completions: {
-          create: jest.fn().mockResolvedValue({
-            choices: [
-              {
-                message: {
-                  content:
-                    '{"improved": "改善されたテキスト", "score": 0.9, "feedback": "良い翻訳です"}',
-                },
-              },
-            ],
-          }),
-        },
-      },
-    })),
+    generateText: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        text: '{"improved": "改善されたテキスト", "score": 0.9, "feedback": "良い翻訳です"}',
+      }),
+    ),
+    embed: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        embedding: [0.1, 0.2, 0.3],
+      }),
+    ),
+  };
+});
+
+// Mock OpenAI provider from Vercel AI SDK
+jest.mock('@ai-sdk/openai', () => {
+  return {
+    openai: {
+      embedding: jest.fn().mockReturnValue('mocked-embedding-model'),
+    },
   };
 });
 
@@ -70,10 +68,9 @@ describe('review command', () => {
     (fs.existsSync as jest.Mock).mockReturnValue(true);
 
     // Mock Parser.parseI18nFile to return the mock entries
-    const mockParseI18nFile = jest
-      .fn()
-      .mockResolvedValueOnce(mockSourceEntries)
-      .mockResolvedValueOnce(mockTargetEntries);
+    const mockParseI18nFile = jest.fn();
+    mockParseI18nFile.mockReturnValueOnce(Promise.resolve(mockSourceEntries));
+    mockParseI18nFile.mockReturnValueOnce(Promise.resolve(mockTargetEntries));
 
     (Parser.prototype.parseI18nFile as jest.Mock) = mockParseI18nFile;
 
