@@ -33,7 +33,13 @@
     "postversion": "git push && git push --tags",
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
-    "release:major": "npm version major"
+    "release:major": "npm version major",
+    "release:beta": "npm version prerelease --preid=beta",
+    "release:alpha": "npm version prerelease --preid=alpha",
+    "release:rc": "npm version prerelease --preid=rc",
+    "publish:beta": "npm publish --tag beta",
+    "publish:alpha": "npm publish --tag alpha",
+    "publish:rc": "npm publish --tag rc"
   },
   "keywords": [
     "i18n",
