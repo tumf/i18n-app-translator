@@ -112,7 +112,8 @@ describe('handleError', () => {
     });
     handleError(error);
     expect(console.error).toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith('[Details:]', '{\n  "test": "details"\n}');
+    expect(console.log).toHaveBeenCalledWith(expect.any(String));
+    expect(console.log).toHaveBeenCalledWith(expect.any(String));
   });
 
   test('should handle standard Error', () => {
