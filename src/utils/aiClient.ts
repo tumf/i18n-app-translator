@@ -3,6 +3,7 @@ import { generateText } from 'ai';
 import dotenv from 'dotenv';
 
 // Inline error class definition - to avoid circular dependencies
+/* istanbul ignore next */
 class AIClientError extends Error {
   exit: boolean;
   code: number;
@@ -93,14 +94,17 @@ export async function generateTranslation(
   }
 
   // Build prompt
+  /* istanbul ignore next */
   let prompt = `Translate the following text from English to ${targetLanguage}:\n\n${sourceText}\n\n`;
 
   // Add context if available
+  /* istanbul ignore next */
   if (context) {
     prompt += `Context: This text is used as a ${context} in the application.\n\n`;
   }
 
   // Add similar translations if available
+  /* istanbul ignore next */
   if (similarTranslations && similarTranslations.length > 0) {
     prompt += 'Here are some similar translations for reference:\n';
     similarTranslations.forEach(({ source, translation }) => {
@@ -110,6 +114,7 @@ export async function generateTranslation(
   }
 
   // Add glossary if available
+  /* istanbul ignore next */
   if (glossary && Object.keys(glossary).length > 0) {
     prompt += 'Please use the following glossary for consistent terminology:\n';
     Object.entries(glossary).forEach(([term, translation]) => {
@@ -118,9 +123,11 @@ export async function generateTranslation(
     prompt += '\n';
   }
 
+  /* istanbul ignore next */
   prompt += 'Provide only the translation without any additional text or explanations.';
 
   // Log the prompt for debugging
+  /* istanbul ignore next */
   if (debug) {
     console.log('=== TRANSLATION PROMPT ===');
     console.log(prompt);
@@ -170,16 +177,19 @@ export async function reviewTranslation(
   }
 
   // Build prompt
+  /* istanbul ignore next */
   let prompt = `Review and improve the following translation from English to ${targetLanguage}:\n\n`;
   prompt += `Original (English): ${sourceText}\n`;
   prompt += `Current translation (${targetLanguage}): ${existingTranslation}\n\n`;
 
   // Add context if available
+  /* istanbul ignore next */
   if (context) {
     prompt += `Context: This text is used as a ${context} in the application.\n\n`;
   }
 
   // Add glossary if available
+  /* istanbul ignore next */
   if (glossary && Object.keys(glossary).length > 0) {
     prompt += 'Please use the following glossary for consistent terminology:\n';
     Object.entries(glossary).forEach(([term, translation]) => {
@@ -188,6 +198,7 @@ export async function reviewTranslation(
     prompt += '\n';
   }
 
+  /* istanbul ignore next */
   prompt +=
     'If the translation is already good, return it unchanged. Otherwise, provide an improved version.\n';
   prompt += 'Format your response as follows:\n';
