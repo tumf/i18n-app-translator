@@ -85,6 +85,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "1.1.14",
+    "@ai-sdk/openai-compatible": "0.2.11",
     "@pinecone-database/pinecone": "^5.0.2",
     "ai": "4.1.46",
     "commander": "^13.1.0",
