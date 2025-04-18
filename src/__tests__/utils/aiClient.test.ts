@@ -42,6 +42,11 @@ describe('aiClient', () => {
     test('should use environment variable if available', () => {
       // Setup
       process.env.TRANSLATION_LLM = 'gpt-4-turbo';
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {
+          providerType: 'openai',
+        },
+      });
 
       // Execute
       const result = getLLMModel();
@@ -71,7 +76,9 @@ describe('aiClient', () => {
     test('should use default if neither environment variable nor config is available', () => {
       // Setup
       delete process.env.TRANSLATION_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
 
       // Execute
       const result = getLLMModel();
@@ -84,7 +91,9 @@ describe('aiClient', () => {
     test('should throw error if openai throws', () => {
       // Setup
       delete process.env.TRANSLATION_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
       // Cast to unknown first to avoid TypeScript error
       (openai as unknown as jest.Mock).mockImplementation(() => {
         throw new Error('Invalid model');
@@ -99,6 +108,11 @@ describe('aiClient', () => {
     test('should use environment variable if available', () => {
       // Setup
       process.env.EMBEDDING_LLM = 'text-embedding-ada-002';
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {
+          providerType: 'openai',
+        },
+      });
 
       // Execute
       const result = getEmbeddingModel();
@@ -128,7 +142,9 @@ describe('aiClient', () => {
     test('should use default if neither environment variable nor config is available', () => {
       // Setup
       delete process.env.EMBEDDING_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
 
       // Execute
       const result = getEmbeddingModel();
@@ -141,7 +157,9 @@ describe('aiClient', () => {
     test('should throw error if openai.embedding throws', () => {
       // Setup
       delete process.env.EMBEDDING_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
       // Cast to unknown first to avoid TypeScript error
       (openai.embedding as unknown as jest.Mock).mockImplementation(() => {
         throw new Error('Invalid model');
