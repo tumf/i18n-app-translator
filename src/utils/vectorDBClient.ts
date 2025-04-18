@@ -270,6 +270,126 @@ export class PineconeVectorDBClient implements IVectorDBClient {
   }
 }
 
+// Chroma implementation
+export class ChromaVectorDBClient implements IVectorDBClient {
+  private client: Record<string, any> | null = null; // ChromaClient type 
+  private collection: Record<string, any> | null = null; // Collection type
+  private collectionName: string;
+
+  constructor(collectionName = 'translations') {
+    this.collectionName = collectionName;
+  }
+
+  /* istanbul ignore next */
+  async initialize(): Promise<void> {
+    if (!process.env.CHROMA_URL) {
+      throw new Error('CHROMA_URL environment variable is not set');
+    }
+
+    const { ChromaClient } = await import('chromadb');
+    
+    this.client = new ChromaClient({
+      path: process.env.CHROMA_URL,
+    });
+
+    const collectionName = process.env.CHROMA_COLLECTION || this.collectionName;
+    
+    try {
+      this.collection = await this.client.getCollection({
+        name: collectionName,
+      });
+    } catch {
+      this.collection = await this.client.createCollection({
+        name: collectionName,
+      });
+    }
+  }
+
+  async addTranslation(
+    sourceText: string,
+    translation: string,
+    language: string,
+    context?: string,
+  ): Promise<void> {
+    if (!this.collection) {
+      throw new Error('Collection not initialized');
+    }
+
+    /* istanbul ignore next - external API call */
+    // Generate embedding using Vercel AI SDK
+    const embeddingResponse = await embed({
+      model: getEmbeddingModel(), // Uses EMBEDDING_LLM environment variable or config
+      value: sourceText,
+    });
+
+    const embedding = embeddingResponse.embedding;
+
+    // Create a unique ID
+    const id = `${language}_${Buffer.from(sourceText).toString('base64')}`;
+
+    await this.collection.add({
+      ids: [id],
+      embeddings: [embedding],
+      metadatas: [{
+        sourceText,
+        translation,
+        language,
+        context: context || 'unknown',
+      }],
+      documents: [sourceText], // Store the original text as the document
+    });
+  }
+
+  async findSimilarTranslations(
+    sourceText: string,
+    language: string,
+    limit = 5,
+  ): Promise<Array<{ source: string; translation: string; similarity: number }>> {
+    if (!this.collection) {
+      throw new Error('Collection not initialized');
+    }
+
+    /* istanbul ignore next - external API call */
+    // Generate embedding using Vercel AI SDK
+    const embeddingResponse = await embed({
+      model: getEmbeddingModel(), // Uses EMBEDDING_LLM environment variable or config
+      value: sourceText,
+    });
+
+    const embedding = embeddingResponse.embedding;
+
+    const queryResult = await this.collection.query({
+      queryEmbeddings: [embedding],
+      nResults: limit,
+      where: { language: language },
+    });
+
+    // Format results to match interface
+    const results: Array<{ source: string; translation: string; similarity: number }> = [];
+    
+    if (queryResult.metadatas && queryResult.metadatas[0]) {
+      for (let i = 0; i < queryResult.metadatas[0].length; i++) {
+        const metadata = queryResult.metadatas[0][i];
+        const distance = queryResult.distances?.[0]?.[i] || 0;
+        const similarity = 1 - distance;
+        
+        results.push({
+          source: metadata.sourceText,
+          translation: metadata.translation,
+          similarity,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /* istanbul ignore next */
+  async close(): Promise<void> {
+    // No explicit close needed for Chroma client
+  }
+}
+
 // Factory function to create the appropriate client
 export interface IVectorDBOptions {
   url?: string;
@@ -280,11 +400,13 @@ export interface IVectorDBOptions {
 
 /* istanbul ignore next */
 export function createVectorDBClient(options: IVectorDBOptions = {}): IVectorDBClient {
-  const { url, apiKey, indexName } = options;
+  const { url, apiKey, indexName, namespace } = options;
 
   // Override environment variables with provided options
   const weaviateUrl = url || process.env.WEAVIATE_URL;
   const pineconeApiKey = apiKey || process.env.PINECONE_API_KEY;
+  const chromaUrl = url || process.env.CHROMA_URL;
+  const chromaCollection = namespace || process.env.CHROMA_COLLECTION;
 
   if (weaviateUrl) {
     // Set environment variables for the client
@@ -297,6 +419,12 @@ export function createVectorDBClient(options: IVectorDBOptions = {}): IVectorDBC
     if (apiKey) process.env.PINECONE_API_KEY = apiKey;
 
     return new PineconeVectorDBClient(indexName);
+  } else if (chromaUrl) {
+    // Set environment variables for the client
+    if (url) process.env.CHROMA_URL = url;
+    if (namespace) process.env.CHROMA_COLLECTION = namespace;
+
+    return new ChromaVectorDBClient(chromaCollection);
   } else {
     throw new Error('No vector database configuration found');
   }
