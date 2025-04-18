@@ -7,6 +7,7 @@ export interface IVectorDBConfig {
   url?: string;
   apiKey?: string;
   namespace?: string;
+  collection?: string; // For Chroma collection name
 }
 
 export interface IGlossaryConfig {

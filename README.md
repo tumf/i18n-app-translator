@@ -64,6 +64,10 @@ Vector database configuration (choose one):
   - `PINECONE_ENVIRONMENT`: Pinecone environment (required for search)
   - `PINECONE_INDEX`: Pinecone index name (optional, default: "translations")
 
+- For Chroma:
+  - `CHROMA_URL`: Chroma URL (required for search)
+  - `CHROMA_COLLECTION`: Chroma collection name (optional, default: "translations")
+
 ## Configuration File
 
 You can customize the default settings by creating a `.i18n-app-translatorrc` file.
@@ -108,6 +112,35 @@ Example configuration for Pinecone:
     "environment": "your-pinecone-environment",
     "indexName": "your-pinecone-index",
     "namespace": "translations"
+  },
+  "glossary": {
+    "enabled": true,
+    "path": "./custom-glossary.json"
+  },
+  "translation": {
+    "concurrency": 5,
+    "showProgress": true,
+    "similarTranslationsLimit": 3,
+    "debug": false
+  },
+  "logging": {
+    "level": 1,
+    "logToFile": true,
+    "logFilePath": "./logs/i18n-app-translator.log",
+    "logToConsole": true,
+    "timestamp": true
+  }
+}
+```
+
+Example configuration for Chroma:
+
+```json
+{
+  "vectorDB": {
+    "enabled": true,
+    "url": "your-chroma-url",
+    "collection": "your-chroma-collection-name"
   },
   "glossary": {
     "enabled": true,
