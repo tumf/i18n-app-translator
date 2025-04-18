@@ -90,7 +90,7 @@ export const Button = () => {
       expect(/[あ-んア-ン]/.test(allTranslations)).toBe(true); // Contains hiragana or katakana
       
       console.log('Testing translation command...');
-      const translationResult = execSync(
+      execSync(
         `node dist/index.js translate --lang ko --source ${path.join(tempDir, 'en.json')} --dest ${path.join(tempDir, 'ko.json')}`,
         {
           stdio: 'pipe',
