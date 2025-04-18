@@ -1,4 +1,5 @@
 
+/* istanbul ignore file */
 const isCI = process.env.CI === 'true';
 
 describe('Chroma and OpenRouter Integration Tests', () => {
