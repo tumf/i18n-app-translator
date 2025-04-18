@@ -43,7 +43,12 @@ program
   .action((options) => {
     try {
       // Validate environment variables if using AI services
-      validateEnvironmentVars(['OPENAI_API_KEY']);
+      const llmProvider = process.env.LLM_PROVIDER || 'openai';
+      if (llmProvider === 'openai') {
+        validateEnvironmentVars(['OPENAI_API_KEY']);
+      } else if (llmProvider === 'openrouter') {
+        validateEnvironmentVars(['OPENROUTER_API_KEY']);
+      }
 
       translate({
         source: options.source,
@@ -80,7 +85,12 @@ program
   .action((options) => {
     try {
       // Validate environment variables if using AI services
-      validateEnvironmentVars(['OPENAI_API_KEY']);
+      const llmProvider = process.env.LLM_PROVIDER || 'openai';
+      if (llmProvider === 'openai') {
+        validateEnvironmentVars(['OPENAI_API_KEY']);
+      } else if (llmProvider === 'openrouter') {
+        validateEnvironmentVars(['OPENROUTER_API_KEY']);
+      }
 
       review({
         source: options.source,
