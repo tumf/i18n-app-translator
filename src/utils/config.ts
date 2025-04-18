@@ -20,6 +20,7 @@ export interface ITranslationConfig {
   showProgress: boolean;
   similarTranslationsLimit: number;
   debug?: boolean;
+  providerType?: string;
   llmProvider?: string;
   embeddingProvider?: string;
 }
@@ -59,6 +60,7 @@ export const DEFAULT_CONFIG: IConfig = {
     showProgress: true,
     similarTranslationsLimit: 3,
     debug: false,
+    providerType: 'openai',
     llmProvider: 'gpt-4o',
     embeddingProvider: 'text-embedding-3-small',
   },

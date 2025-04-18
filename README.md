@@ -50,7 +50,9 @@ cp .env.example .env
 
 Required environment variables:
 
-- `OPENAI_API_KEY`: API key for Vercel AI SDK with OpenAI provider (required for translation)
+- `OPENAI_API_KEY`: API key for OpenAI (required if using OpenAI provider)
+- `OPENROUTER_API_KEY`: API key for OpenRouter (required if using OpenRouter provider)
+- `LLM_PROVIDER`: Provider to use for LLM operations (openai or openrouter, default: openai)
 
 Vector database configuration (choose one):
 
@@ -90,7 +92,10 @@ Example configuration for Weaviate:
     "concurrency": 5,
     "showProgress": true,
     "similarTranslationsLimit": 3,
-    "debug": false
+    "debug": false,
+    "providerType": "openai",
+    "llmProvider": "gpt-4o",
+    "embeddingProvider": "text-embedding-3-small"
   },
   "logging": {
     "level": 1,
@@ -121,7 +126,10 @@ Example configuration for Pinecone:
     "concurrency": 5,
     "showProgress": true,
     "similarTranslationsLimit": 3,
-    "debug": false
+    "debug": false,
+    "providerType": "openai",
+    "llmProvider": "gpt-4o",
+    "embeddingProvider": "text-embedding-3-small"
   },
   "logging": {
     "level": 1,

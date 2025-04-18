@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
 import dotenv from 'dotenv';
 
@@ -22,6 +23,9 @@ dotenv.config();
 // Check if mock mode is enabled
 const MOCK_MODE = process.env.MOCK_MODE === 'true';
 
+const PROVIDER_OPENAI = 'openai';
+const PROVIDER_OPENROUTER = 'openrouter';
+
 // Default LLM models
 const DEFAULT_LLM = 'gpt-4o';
 const DEFAULT_EMBEDDING_LLM = 'text-embedding-3-small';
@@ -37,13 +41,26 @@ import configManager from './config';
 export function getLLMModel() {
   // Check for environment variable first, then config, then default
   const config = configManager.getConfig();
+  
+  const providerType = process.env.LLM_PROVIDER || config.translation?.providerType || PROVIDER_OPENAI;
   const llmProvider = process.env.TRANSLATION_LLM || config.translation?.llmProvider || DEFAULT_LLM;
 
   try {
-    return openai(llmProvider);
+    if (providerType === PROVIDER_OPENROUTER) {
+      const model = createOpenAICompatible({
+        baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+        name: 'openrouter',
+        apiKey: process.env.OPENROUTER_API_KEY,
+      }).chatModel(llmProvider);
+      return model as any;
+    } else {
+      // Default to OpenAI
+      const model = openai(llmProvider);
+      return model as any;
+    }
   } catch {
     throw new AIClientError(
-      `Invalid LLM provider: ${llmProvider}. Please use a valid OpenAI model.`,
+      `Invalid LLM provider: ${llmProvider}. Please use a valid model for ${providerType}.`,
       true,
       1,
     );
@@ -58,14 +75,25 @@ export function getLLMModel() {
 export function getEmbeddingModel() {
   // Check for environment variable first, then config, then default
   const config = configManager.getConfig();
+  
+  const providerType = process.env.LLM_PROVIDER || config.translation?.providerType || PROVIDER_OPENAI;
   const embeddingProvider =
     process.env.EMBEDDING_LLM || config.translation?.embeddingProvider || DEFAULT_EMBEDDING_LLM;
 
   try {
-    return openai.embedding(embeddingProvider);
+    if (providerType === PROVIDER_OPENROUTER) {
+      return createOpenAICompatible({
+        baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+        name: 'openrouter',
+        apiKey: process.env.OPENROUTER_API_KEY,
+      }).textEmbeddingModel(embeddingProvider) as any;
+    } else {
+      // Default to OpenAI
+      return openai.embedding(embeddingProvider) as any;
+    }
   } catch {
     throw new AIClientError(
-      `Invalid embedding provider: ${embeddingProvider}. Please use a valid OpenAI embedding model.`,
+      `Invalid embedding provider: ${embeddingProvider}. Please use a valid model for ${providerType}.`,
       true,
       1,
     );

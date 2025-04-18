@@ -1,11 +1,19 @@
 import { getLLMModel, getEmbeddingModel } from '../../utils/aiClient';
 import { openai } from '@ai-sdk/openai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import configManager from '../../utils/config';
 
 // Mock dependencies
 jest.mock('@ai-sdk/openai', () => ({
   openai: jest.fn().mockReturnValue('mocked-llm'),
   embedding: jest.fn().mockReturnValue('mocked-embedding'),
+}));
+
+jest.mock('@ai-sdk/openai-compatible', () => ({
+  createOpenAICompatible: jest.fn().mockReturnValue({
+    chatModel: jest.fn().mockReturnValue('mocked-openrouter-llm'),
+    textEmbeddingModel: jest.fn().mockReturnValue('mocked-openrouter-embedding'),
+  }),
 }));
 
 jest.mock('../../utils/config', () => ({
@@ -34,6 +42,11 @@ describe('aiClient', () => {
     test('should use environment variable if available', () => {
       // Setup
       process.env.TRANSLATION_LLM = 'gpt-4-turbo';
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {
+          providerType: 'openai',
+        },
+      });
 
       // Execute
       const result = getLLMModel();
@@ -63,7 +76,9 @@ describe('aiClient', () => {
     test('should use default if neither environment variable nor config is available', () => {
       // Setup
       delete process.env.TRANSLATION_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
 
       // Execute
       const result = getLLMModel();
@@ -76,7 +91,9 @@ describe('aiClient', () => {
     test('should throw error if openai throws', () => {
       // Setup
       delete process.env.TRANSLATION_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
       // Cast to unknown first to avoid TypeScript error
       (openai as unknown as jest.Mock).mockImplementation(() => {
         throw new Error('Invalid model');
@@ -91,6 +108,11 @@ describe('aiClient', () => {
     test('should use environment variable if available', () => {
       // Setup
       process.env.EMBEDDING_LLM = 'text-embedding-ada-002';
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {
+          providerType: 'openai',
+        },
+      });
 
       // Execute
       const result = getEmbeddingModel();
@@ -120,7 +142,9 @@ describe('aiClient', () => {
     test('should use default if neither environment variable nor config is available', () => {
       // Setup
       delete process.env.EMBEDDING_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
 
       // Execute
       const result = getEmbeddingModel();
@@ -133,7 +157,9 @@ describe('aiClient', () => {
     test('should throw error if openai.embedding throws', () => {
       // Setup
       delete process.env.EMBEDDING_LLM;
-      (configManager.getConfig as jest.Mock).mockReturnValue({});
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {}
+      });
       // Cast to unknown first to avoid TypeScript error
       (openai.embedding as unknown as jest.Mock).mockImplementation(() => {
         throw new Error('Invalid model');
@@ -141,6 +167,79 @@ describe('aiClient', () => {
 
       // Execute & Verify
       expect(() => getEmbeddingModel()).toThrow('Invalid embedding provider');
+    });
+  });
+  
+  describe('getLLMModel with OpenRouter', () => {
+    test('should use OpenRouter provider when LLM_PROVIDER is set to openrouter', () => {
+      // Setup
+      process.env.LLM_PROVIDER = 'openrouter';
+      process.env.OPENROUTER_API_KEY = 'test-openrouter-key';
+      process.env.TRANSLATION_LLM = 'claude-3-opus';
+
+      // Execute
+      const result = getLLMModel();
+
+      // Verify
+      expect(createOpenAICompatible).toHaveBeenCalledWith({
+        baseURL: 'https://openrouter.ai/api/v1',
+        name: 'openrouter',
+        apiKey: 'test-openrouter-key',
+      });
+      expect(result).toBe('mocked-openrouter-llm');
+
+      delete process.env.LLM_PROVIDER;
+      delete process.env.OPENROUTER_API_KEY;
+      delete process.env.TRANSLATION_LLM;
+    });
+    
+    test('should use OpenRouter provider when providerType is set to openrouter in config', () => {
+      // Setup
+      delete process.env.LLM_PROVIDER;
+      (configManager.getConfig as jest.Mock).mockReturnValue({
+        translation: {
+          providerType: 'openrouter',
+          llmProvider: 'claude-3-haiku',
+        },
+      });
+      process.env.OPENROUTER_API_KEY = 'test-openrouter-key';
+
+      // Execute
+      const result = getLLMModel();
+
+      // Verify
+      expect(createOpenAICompatible).toHaveBeenCalledWith({
+        baseURL: 'https://openrouter.ai/api/v1',
+        name: 'openrouter',
+        apiKey: 'test-openrouter-key',
+      });
+      expect(result).toBe('mocked-openrouter-llm');
+
+      delete process.env.OPENROUTER_API_KEY;
+    });
+  });
+  
+  describe('getEmbeddingModel with OpenRouter', () => {
+    test('should use OpenRouter provider when LLM_PROVIDER is set to openrouter', () => {
+      // Setup
+      process.env.LLM_PROVIDER = 'openrouter';
+      process.env.OPENROUTER_API_KEY = 'test-openrouter-key';
+      process.env.EMBEDDING_LLM = 'text-embedding-3-large';
+
+      // Execute
+      const result = getEmbeddingModel();
+
+      // Verify
+      expect(createOpenAICompatible).toHaveBeenCalledWith({
+        baseURL: 'https://openrouter.ai/api/v1',
+        name: 'openrouter',
+        apiKey: 'test-openrouter-key',
+      });
+      expect(result).toBe('mocked-openrouter-embedding');
+
+      delete process.env.LLM_PROVIDER;
+      delete process.env.OPENROUTER_API_KEY;
+      delete process.env.EMBEDDING_LLM;
     });
   });
 });
