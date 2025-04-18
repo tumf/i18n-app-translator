@@ -28,3 +28,6 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 glossary.json
+
+# Local chroma databases
+**/chroma-db/

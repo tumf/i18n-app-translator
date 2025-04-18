@@ -27,6 +27,7 @@ jobs:
     - run: npm run build
     - run: npm run lint
     - run: npm test
+    # Integration tests are not run in CI environment (they run only locally with proper credentials)
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       with:
