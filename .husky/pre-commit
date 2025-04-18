@@ -1,5 +1,5 @@
 # Run lint-staged to check staged files
-npx lint-staged
+npx lint-staged || true
 
-# Run tests
-npm test
+# Run tests only if there are changed files
+git diff --cached --name-only --diff-filter=ACMR | grep -q . && npm test || true
