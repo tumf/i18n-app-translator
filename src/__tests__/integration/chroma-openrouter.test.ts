@@ -8,12 +8,10 @@ describe('Chroma and OpenRouter Integration Tests', () => {
   let chromaClient: ChromaVectorDBClient;
 
   beforeAll(async () => {
+    process.env.CI = '';
     process.env.LLM_PROVIDER = 'openrouter';
     
-    if (process.env.CI) {
-      console.log('Skipping integration tests in CI environment');
-      return;
-    }
+    console.log('Running integration tests locally');
 
     if (!process.env.OPENROUTER_API_KEY) {
       throw new Error('OPENROUTER_API_KEY environment variable is not set');
@@ -36,9 +34,6 @@ describe('Chroma and OpenRouter Integration Tests', () => {
   });
 
   afterAll(async () => {
-    if (process.env.CI) {
-      return;
-    }
 
     if (chromaClient) {
       await chromaClient.close();
@@ -48,10 +43,7 @@ describe('Chroma and OpenRouter Integration Tests', () => {
   });
 
   test('Add and retrieve translations using Chroma and OpenRouter', async () => {
-    if (process.env.CI) {
-      console.log('Skipping test in CI environment');
-      return;
-    }
+    console.log('Running test locally');
 
     const sourceText = 'Welcome to our application';
     const translation = 'アプリケーションへようこそ';

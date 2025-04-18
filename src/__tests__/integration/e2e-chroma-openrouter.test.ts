@@ -7,10 +7,8 @@ describe('E2E Integration Tests with Chroma and OpenRouter', () => {
   let tempDir: string;
 
   beforeAll(() => {
-    if (process.env.CI === 'true') {
-      console.log('Skipping E2E integration tests in CI environment');
-      return;
-    }
+    process.env.CI = '';
+    console.log('Running E2E integration tests locally');
 
     if (!process.env.OPENROUTER_API_KEY) {
       throw new Error('OPENROUTER_API_KEY environment variable is not set');
@@ -53,18 +51,12 @@ export const Button = () => {
   });
 
   afterAll(() => {
-    if (process.env.CI === 'true') {
-      return;
-    }
 
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
   test('Full workflow with Chroma and OpenRouter: build-vector -> translate -> review', () => {
-    if (process.env.CI === 'true') {
-      console.log('Skipping test in CI environment');
-      return;
-    }
+    console.log('Running E2E test locally');
 
     try {
       console.log('Building vector database...');
