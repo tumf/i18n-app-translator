@@ -7,7 +7,7 @@ describe('E2E Integration Tests with Chroma and OpenRouter', () => {
   let tempDir: string;
 
   beforeAll(() => {
-    if (process.env.CI) {
+    if (process.env.CI === 'true') {
       console.log('Skipping E2E integration tests in CI environment');
       return;
     }
@@ -53,7 +53,7 @@ export const Button = () => {
   });
 
   afterAll(() => {
-    if (process.env.CI) {
+    if (process.env.CI === 'true') {
       return;
     }
 
@@ -61,7 +61,7 @@ export const Button = () => {
   });
 
   test('Full workflow with Chroma and OpenRouter: build-vector -> translate -> review', () => {
-    if (process.env.CI) {
+    if (process.env.CI === 'true') {
       console.log('Skipping test in CI environment');
       return;
     }
