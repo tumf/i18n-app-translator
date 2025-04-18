@@ -61,7 +61,7 @@ export const Button = () => {
     try {
       console.log('Building vector database...');
       execSync(
-        `node dist/index.js build-vector --source ${path.join(tempDir, 'en.json')} --context ${path.join(tempDir, 'src')}`,
+        `node dist/index.js build-vector --source ${path.join(tempDir, 'en.json')} --context ${path.join(tempDir, 'src')} --target ${path.join(tempDir, 'vector-db')}`,
         {
           stdio: 'pipe',
           env: {

@@ -289,7 +289,9 @@ export class ChromaVectorDBClient implements IVectorDBClient {
     const { ChromaClient } = await import('chromadb');
     
     this.client = new ChromaClient({
-      path: process.env.CHROMA_URL,
+      path: process.env.CHROMA_URL.startsWith('http') 
+        ? process.env.CHROMA_URL 
+        : 'http://localhost:8000',
     });
 
     const collectionName = process.env.CHROMA_COLLECTION || this.collectionName;
